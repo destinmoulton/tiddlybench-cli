@@ -11,6 +11,14 @@ func PromptForConfig() {
 	url := promptURL()
 
 	username := promptUsername()
+	savePassword := selectSavePassword()
+
+	if savePassword == "Yes" {
+
+		password := promptPassword()
+
+		fmt.Println(password)
+	}
 	fmt.Println(url)
 	fmt.Println(username)
 }
@@ -53,6 +61,35 @@ func promptUsername() string {
 
 }
 
+func promptPassword() string {
+
+	prompt := promptui.Prompt{
+		Label: "Password",
+		Mask:  '*',
+	}
+	password, err := prompt.Run()
+
+	if err != nil {
+
+	}
+
+	return password
+
+}
+
+func selectSavePassword() string {
+	prompt := promptui.Select{
+		Label: "Save Password?",
+		Items: []string{"Yes", "No"},
+	}
+
+	_, result, err := prompt.Run()
+
+	if err != nil {
+	}
+
+	return result
+}
 func isUrl(str string) bool {
 	// https://stackoverflow.com/questions/31480710/validate-url-with-standard-package-in-go
 	u, err := url.Parse(str)
