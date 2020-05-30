@@ -2,12 +2,11 @@ package config
 
 import (
 	"errors"
-	"fmt"
 	"github.com/manifoldco/promptui"
 	"tiddly-cli/internal/util"
 )
 
-func PromptForConfig(config *Config) {
+func (c *Config) PromptForConfig() {
 	url := promptURL()
 
 	username := promptUsername()
@@ -17,12 +16,12 @@ func PromptForConfig(config *Config) {
 		password = promptPassword()
 	}
 
-	// Set the config values
-	config.Set("Username", username)
-	config.Set("Password", password)
-	config.Set("URL", url)
-	config.Set("SavePassword", savePassword)
-	config.Save()
+	// Set the c values
+	c.Set("Username", username)
+	c.Set("Password", password)
+	c.Set("URL", url)
+	c.Set("SavePassword", savePassword)
+	c.Save()
 }
 
 func promptURL() string {
