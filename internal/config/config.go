@@ -21,6 +21,7 @@ var defaults = map[string]setting{
 	"Username": {"string", ""},
 	"Password": {"string", ""},
 	"URL":      {"string", ""},
+	"SavePassword": {"string", ""}
 }
 
 type Config struct {
@@ -51,6 +52,10 @@ func (c *Config) Get(key string) string {
 	return c.viper.GetString(key)
 }
 
+func (c *Config) Set(key string, value string) {
+	c.viper.Set(key, value)
+}
+
 func (c *Config) setup() {
 
 	configPath := c.getConfigPath()
@@ -62,7 +67,7 @@ func (c *Config) setup() {
 	if err := c.viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
 			// Create a config with defaults
-			c.save()
+			c.Save()
 
 			if serr := c.viper.ReadInConfig(); serr != nil {
 				c.log.Fatal("Unable to find the config, even after trying to create it. Something weird this way goes.")
@@ -75,7 +80,7 @@ func (c *Config) setup() {
 	}
 }
 
-func (c *Config) save() {
+func (c *Config) Save() {
 
 	// Config file not found; ignore error if desired
 	if verr := c.viper.WriteConfig(); verr != nil {
@@ -95,6 +100,9 @@ func (c *Config) setupConfigDir(dir string) {
 			}
 
 			c.createEmptyConfigFile()
+
+			// Save the defaults
+			c.Save()
 		} else {
 			// other error
 			c.log.Fatal(err)
@@ -103,12 +111,12 @@ func (c *Config) setupConfigDir(dir string) {
 }
 
 func (c *Config) createEmptyConfigFile() {
-
-	file := path.Join(dir, c.getConfigFilename())
-	f, ferr := os.OpenFile(file, os.O_CREATE|os.O_WRONLY, 0700)
+	configFile := c.getFullConfigPath()
+	f, ferr := os.OpenFile(configFile, os.O_CREATE|os.O_WRONLY, 0700)
 	if ferr != nil {
-		c.log.Fatal("Unable to create config filename.")
+		c.log.Fatal("Unable to create config file [" + configFile + "]")
 	}
+	// Empty json
 	f.WriteString("{}")
 
 	if cerr := f.Close(); cerr != nil {
@@ -116,8 +124,10 @@ func (c *Config) createEmptyConfigFile() {
 	}
 }
 
-func (c *Config) getConfigFilename() string {
-	return configName + "." + configExt
+func (c *Config) getFullConfigPath() string {
+	dir := c.getConfigPath()
+	filename := configName + "." + configExt
+	return path.Join(dir, filename)
 }
 
 func (c *Config) getConfigPath() string {
