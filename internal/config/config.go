@@ -18,10 +18,10 @@ type setting struct {
 }
 
 var defaults = map[string]setting{
-	"Username": {"string", ""},
-	"Password": {"string", ""},
-	"URL":      {"string", ""},
-	"SavePassword": {"string", ""}
+	"Username":     {"string", ""},
+	"Password":     {"string", ""},
+	"URL":          {"string", ""},
+	"SavePassword": {"string", ""},
 }
 
 type Config struct {
