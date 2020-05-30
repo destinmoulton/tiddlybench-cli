@@ -7,20 +7,22 @@ import (
 	"tiddly-cli/internal/util"
 )
 
-func PromptForConfig() {
+func PromptForConfig(config *Config) {
 	url := promptURL()
 
 	username := promptUsername()
 	savePassword := selectSavePassword()
-
+	password := ""
 	if savePassword == "Yes" {
-
-		password := promptPassword()
-
-		fmt.Println(password)
+		password = promptPassword()
 	}
-	fmt.Println(url)
-	fmt.Println(username)
+
+	// Set the config values
+	config.Set("Username", username)
+	config.Set("Password", password)
+	config.Set("URL", url)
+	config.Set("SavePassword", savePassword)
+	config.Save()
 }
 
 func promptURL() string {
