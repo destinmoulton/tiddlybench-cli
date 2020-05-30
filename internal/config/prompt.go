@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/manifoldco/promptui"
-	"net/url"
+	"tiddly-cli/internal/util"
 )
 
 func PromptForConfig() {
@@ -27,7 +27,7 @@ func promptURL() string {
 
 	validate := func(input string) error {
 
-		if !isUrl(input) {
+		if !util.IsURL(input) {
 			return errors.New("The URL is not valid. Should start with http:// or https://")
 		}
 		return nil
@@ -89,9 +89,4 @@ func selectSavePassword() string {
 	}
 
 	return result
-}
-func isUrl(str string) bool {
-	// https://stackoverflow.com/questions/31480710/validate-url-with-standard-package-in-go
-	u, err := url.Parse(str)
-	return err == nil && u.Scheme != "" && u.Host != ""
 }
