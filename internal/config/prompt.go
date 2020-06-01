@@ -6,14 +6,14 @@ import (
 	"tiddly-cli/internal/util"
 )
 
-func (c *Config) PromptForConfig() {
+func (c *Config) promptForConfig() {
 	url := promptURL()
 
 	username := promptUsername()
 	savePassword := selectSavePassword()
 	password := ""
 	if savePassword == "Yes" {
-		password = promptPassword()
+		password = PromptForPassword()
 	}
 
 	// Set the c values
@@ -62,7 +62,8 @@ func promptUsername() string {
 
 }
 
-func promptPassword() string {
+// PromptForPassword uses promptui to get the basic auth password
+func PromptForPassword() string {
 
 	prompt := promptui.Prompt{
 		Label: "Password",

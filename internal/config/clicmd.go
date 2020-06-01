@@ -24,6 +24,6 @@ func (c *Config) setupCLICommands() {
 
 func (c *Config) initConfig() {
 	if shouldRunConfig {
-		c.PromptForConfig()
+		c.promptForConfig()
 	}
 }
