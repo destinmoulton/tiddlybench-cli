@@ -18,10 +18,11 @@ type setting struct {
 }
 
 var defaults = map[string]setting{
-	"Username":     {"string", ""},
-	"Password":     {"string", ""},
-	"URL":          {"string", ""},
-	"SavePassword": {"string", ""},
+	"URL":           {"string", "https://"},
+	"TitleTemplate": {"string", "YYYY-0MM-0DD Journal"},
+	"Username":      {"string", ""},
+	"SavePassword":  {"string", "N"},
+	"Password":      {"string", ""},
 }
 
 type Config struct {
@@ -42,6 +43,15 @@ func (c *Config) initializeDefaults() {
 	for key, setting := range defaults {
 		c.viper.SetDefault(key, setting.defaultvalue)
 	}
+}
+
+func (c *Config) IsConfigFileSet() bool {
+	url := c.Get("URL")
+	// May need to alter what is checked
+	if url != "" {
+		return true
+	}
+	return false
 }
 
 func (c *Config) Get(key string) string {
