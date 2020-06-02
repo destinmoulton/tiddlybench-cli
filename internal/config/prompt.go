@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/manifoldco/promptui"
 	"tiddly-cli/internal/util"
+	"time"
 )
 
 func (c *Config) DispatchPrompt() {
@@ -131,4 +132,25 @@ func PromptForPassword() string {
 
 	return password
 
+}
+
+// PromptTiddlerTitle asks the user for the title of the
+// tiddler to add
+func (c *Config) PromptTiddlerTitle() string {
+
+	title := c.Get("TitleTemplate")
+	title = util.ConvertTiddlyTimeToGo(title)
+	title = time.Now().Format(title)
+
+	prompt := promptui.Prompt{
+		Label:   "Tiddler Title",
+		Default: title,
+	}
+
+	finaltitle, err := prompt.Run()
+	if err != nil {
+
+	}
+
+	return finaltitle
 }
