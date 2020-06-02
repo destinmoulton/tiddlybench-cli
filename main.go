@@ -1,18 +1,12 @@
 package main
 
 import (
-	"tiddly-cli/internal/apicall"
-	"tiddly-cli/internal/config"
+	"tiddly-cli/internal/dispatch"
 	logger "tiddly-cli/internal/logger"
 )
 
 func main() {
 	log := logger.GetInstance()
-	log.Info("Running tiddly-cli")
 
-	config := config.New("user", "pass", "url")
-	apicall := apicall.New(log, config)
-	s := apicall.GetAllTiddlers()
-
-	log.Info(s)
+	dispatch.Dispatch(log)
 }
