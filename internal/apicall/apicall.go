@@ -1,10 +1,13 @@
 package apicall
 
 import (
-	"tiddly-cli/internal/config"
-	"tiddly-cli/internal/logger"
+	"bytes"
+	"encoding/json"
+	"io"
 	"io/ioutil"
 	"net/http"
+	"tiddly-cli/internal/config"
+	"tiddly-cli/internal/logger"
 )
 
 // APICall struct
@@ -24,17 +27,17 @@ func New(log logger.Logger, config *config.Config) *APICall {
 }
 
 func (a *APICall) getFullURL(uri string) string {
-	return a.config.BaseURL + uri
+	return a.config.Get(config.URL) + uri
 }
 
 // Get a URI
 func (a *APICall) Get(uri string) string {
 	url := a.getFullURL(uri)
 
-	req, _ := http.NewRequest("GET", url, nil)
+	req, _ := http.NewRequest(http.MethodGet, url, nil)
 
-	a.log.Info("Getting " + url)
-	req.SetBasicAuth(a.config.Auth.Username, a.config.Auth.Password)
+	a.log.Info("GET " + url)
+	req.SetBasicAuth(a.config.Get(config.Username), a.config.Get(config.Password))
 
 	resp, err := a.client.Do(req)
 	if err != nil {
@@ -43,4 +46,43 @@ func (a *APICall) Get(uri string) string {
 
 	bodyText, _ := ioutil.ReadAll(resp.Body)
 	return string(bodyText)
+}
+
+// Put a Single Tiddler
+func (a *APICall) Put(uri string, tiddler MinimalSingleTiddler) bool {
+	url := a.getFullURL(uri)
+
+	// Convert the tiddler to json
+	json, jerr := json.Marshal(tiddler)
+	if jerr != nil {
+		a.log.Fatal(jerr)
+	}
+
+	resp := a.makeRequest(http.MethodPut, url, bytes.NewBuffer(json))
+
+	a.log.Info(bytes.NewBuffer(json))
+
+	a.log.Info(resp)
+
+	if resp.StatusCode == 204 {
+		return true
+	}
+	return false
+}
+
+func (a *APICall) makeRequest(method string, url string, body io.Reader) *http.Response {
+
+	req, _ := http.NewRequest(method, url, body)
+
+	a.log.Info("makeRequest() :: " + method + " " + url)
+	req.SetBasicAuth(a.config.Get(config.Username), a.config.Get(config.Password))
+	req.Header.Set("Content-Type", "application/json")
+	// This is used for "authentication" by tiddlywiki (Major pain to figure out)
+	req.Header.Add("X-Requested-With", "TiddlyWiki")
+	a.log.Info("makeRequest() :: req ", req)
+	resp, err := a.client.Do(req)
+	if err != nil {
+		a.log.Fatal(err)
+	}
+	return resp
 }
