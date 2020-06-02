@@ -29,17 +29,17 @@ func (c *Config) PromptForConfig() {
 	titletemplate := promptTitleTemplate(c.Get("TitleTemplate"))
 	savePassword := promptToSavePassword(c.Get("SavePassword"))
 	password := ""
-	if savePassword == "y" {
+	if savePassword == Yes {
 		password = PromptForPassword()
 	}
 
 	// Set the c values
 	if url != "" && username != "" {
-		c.Set("URL", url)
-		c.Set("TitleTemplate", titletemplate)
-		c.Set("Username", username)
-		c.Set("SavePassword", savePassword)
-		c.Set("Password", password)
+		c.Set(URL, url)
+		c.Set(TitleTemplate, titletemplate)
+		c.Set(Username, username)
+		c.Set(SavePassword, savePassword)
+		c.Set(Password, password)
 		c.Save()
 	}
 }
@@ -111,6 +111,12 @@ func promptToSavePassword(dflt string) string {
 
 	result, err := prompt.Run()
 
+	if result == "y" {
+		result = Yes
+	} else {
+		result = No
+	}
+
 	if err != nil {
 	}
 
@@ -153,4 +159,20 @@ func (c *Config) PromptTiddlerTitle() string {
 	}
 
 	return finaltitle
+}
+
+// PromptTiddlerText gets the text for the tiddler
+func (c *Config) PromptTiddlerText() string {
+
+	prompt := promptui.Prompt{
+		Label:   "New Tiddler Text",
+		Default: "",
+	}
+
+	text, err := prompt.Run()
+	if err != nil {
+
+	}
+
+	return text
 }
