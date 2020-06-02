@@ -1,29 +1,21 @@
 package config
 
 import (
-	"github.com/spf13/cobra"
+	flag "github.com/spf13/pflag"
 )
 
 var (
 	shouldRunConfig = false
-	rootCmd         = &cobra.Command{
-		Use:   "tikli",
-		Short: "A Tiddly Wiki cli application.",
-		Long: `tikli is a CLI application for Tiddly Wiki.
-Add journal entries to tiddlywiki directly from the command line.`,
-	}
 )
 
-// SetupCLICommands initializes the cobra command line flags
-func (c *Config) setupCLICommands() {
+// CheckCLIFlags initializes the cobra command line flags parser
+func (c *Config) CheckCLIFlags() {
 
-	cobra.OnInitialize(c.initConfig)
-
-	rootCmd.PersistentFlags().BoolVarP(&shouldRunConfig, "config", "c", true, "Run the configuration prompt.")
+	flag.BoolVarP(&shouldRunConfig, "config", "c", false, "Run the configuration prompt.")
+	flag.Parse()
 }
 
-func (c *Config) initConfig() {
-	if shouldRunConfig {
-		c.promptForConfig()
-	}
+// ShouldPromptForConfig returns bool as to whether the config should be rerun
+func (c *Config) ShouldPromptForConfig() bool {
+	return shouldRunConfig
 }
