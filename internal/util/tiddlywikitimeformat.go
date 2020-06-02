@@ -10,11 +10,15 @@ type goTimeFormat = string
 var conversionMap = map[tiddlyDateFormat]goTimeFormat{
 	"DDD":   "Monday",
 	"ddd":   "Mon",
-	"DD":    "1",
-	"0DD":   "01",
+	"DD":    "2",
+	"0DD":   "02",
 	"DDth":  "",
 	"WW":    "",
 	"0WW":   "",
+	"MMM":   "January",
+	"mmm":   "Jan",
+	"MM":    "1",
+	"0MM":   "01",
 	"YYYY":  "2006",
 	"YY":    "06",
 	"hh":    "15",
@@ -56,7 +60,7 @@ func ConvertTiddlyTimeToGo(tiddlytime string) string {
 	for tidformat, goformat := range conversionMap {
 		if goformat != "" {
 
-			strings.ReplaceAll(gotime, tidformat, goformat)
+			gotime = strings.ReplaceAll(gotime, tidformat, goformat)
 		}
 	}
 	return gotime
