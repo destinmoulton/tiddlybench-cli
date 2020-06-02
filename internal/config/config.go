@@ -17,19 +17,38 @@ type setting struct {
 	defaultvalue string
 }
 
+const (
+	// URL config setting
+	URL = "URL"
+	// TitleTemplate config setting
+	TitleTemplate = "TitleTemplate"
+	// Username config setting
+	Username = "Username"
+	// SavePassword config setting
+	SavePassword = "SavePassword"
+	// Password config setting
+	Password = "Password"
+	// Yes definition
+	Yes = "yes"
+	// No Definition
+	No = "no"
+)
+
 var defaults = map[string]setting{
-	"URL":           {"string", "https://"},
-	"TitleTemplate": {"string", "YYYY-0MM-0DD Journal"},
-	"Username":      {"string", ""},
-	"SavePassword":  {"string", "N"},
-	"Password":      {"string", ""},
+	URL:           {"string", "https://"},
+	TitleTemplate: {"string", "YYYY-0MM-0DD Journal"},
+	Username:      {"string", ""},
+	SavePassword:  {"string", "N"},
+	Password:      {"string", ""},
 }
 
+// Config is a struct for the configuration interface
 type Config struct {
 	log   logger.Logger
 	viper *viper.Viper
 }
 
+// New creates a Config object
 func New(log logger.Logger) *Config {
 	c := new(Config)
 	c.log = log
@@ -45,8 +64,10 @@ func (c *Config) initializeDefaults() {
 	}
 }
 
+// IsConfigFileSet returns boolean if the config file is setup
 func (c *Config) IsConfigFileSet() bool {
 	url := c.Get("URL")
+
 	// May need to alter what is checked
 	if url != "" {
 		return true
@@ -54,6 +75,7 @@ func (c *Config) IsConfigFileSet() bool {
 	return false
 }
 
+// Get returns a config value by key
 func (c *Config) Get(key string) string {
 	_, ok := defaults[key]
 	if !ok {
@@ -62,6 +84,7 @@ func (c *Config) Get(key string) string {
 	return c.viper.GetString(key)
 }
 
+// Set assigns a config value to a key
 func (c *Config) Set(key string, value string) {
 	c.viper.Set(key, value)
 }
@@ -90,6 +113,7 @@ func (c *Config) setup() {
 	}
 }
 
+// Save the config to the file
 func (c *Config) Save() {
 
 	// Config file not found; ignore error if desired
