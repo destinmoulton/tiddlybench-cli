@@ -87,7 +87,9 @@ You can add info to two types of tiddlers:
 -   Inbox (`-i`)
 -   Journal (`-j`)
 
-# Date and Time in Titles
+You can repurpose either of them to fit your needs. General use case is to set the Inbox title to something static, like `Inbox`, and then set the Journal to a date generated title. See [Date and Time in Titles](#date-and-time-in-titles) for information on what date time string substitutions are available.
+
+## Date and Time in Titles
 
 You can configure the tiddlers (either Inbox or Journal) to use date and time string substitutions.
 
