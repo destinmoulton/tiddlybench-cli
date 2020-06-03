@@ -86,10 +86,6 @@ func (c *Config) IsConfigFileSet() bool {
 
 // Get returns a config value by key
 func (c *Config) Get(key string) string {
-	_, ok := defaults[key]
-	if !ok {
-		c.log.Fatal("The config key " + key + " does not exist.")
-	}
 	return c.viper.GetString(key)
 }
 
