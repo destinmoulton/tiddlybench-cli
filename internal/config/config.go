@@ -41,7 +41,7 @@ var Blocks = map[string]BlockParts{
 	"h3":     {Begin: "!!! ", End: "\n"},
 	"h4":     {Begin: "!!!! ", End: "\n"},
 	"h5":     {Begin: "!!!!! ", End: "\n"},
-	"custom": {Begin: "!!!!! ", End: "\n"},
+	"custom": {Begin: "\n\n", End: "\n\n"},
 }
 
 // Config is a struct for the configuration interface
