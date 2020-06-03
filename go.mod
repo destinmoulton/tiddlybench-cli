@@ -3,6 +3,7 @@ module tiddly-cli
 go 1.14
 
 require (
+	github.com/atotto/clipboard v0.1.2
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/go-delve/delve v1.4.1 // indirect
 	github.com/gopherjs/gopherjs v0.0.0-20200217142428-fce0ec30dd00 // indirect
