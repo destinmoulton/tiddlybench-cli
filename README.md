@@ -2,8 +2,11 @@
 
 ## Commands
 
-| -p | --paste | Paste directly from the clipboard. See [Clipboard Usage](#clipboard-usage)|
-| -f | --force | Don't ask for the tiddler title. Use the template tiddler title.|
+| Flag | Command   | Description                                                  |
+| ---- | --------- | ------------------------------------------------------------ |
+| -p   | --paste   | Paste the clipboard. See [Clipboard Usage](#clipboard-usage) |
+| -i   | --inbox   | Add to the Inbox                                             |
+| -j   | --journal | Add to the Journal                                           |
 
 ## Blocks
 
@@ -43,8 +46,7 @@ $HOME/Library/Application Support/tikli/config.json
 
 You can customize the blocks by configuring the `begin` and `end` string for a block.
 
-````
-"blocks":
+Add `\n` to add a newline.
 
 # Authentication
 
@@ -68,7 +70,7 @@ Paste and ask for Tiddler title.
 
 ```bash
 $ tikli -p
-````
+```
 
 Paste and add to the Journal.
 
