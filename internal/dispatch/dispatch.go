@@ -33,6 +33,7 @@ func Dispatch(log logger.Logger) {
 
 		tiddlerTitle := cfg.PromptTiddlerTitle()
 		api := apicall.New(log, cfg)
+		block := cfg.GetSelectedBlock()
 
 		tiddler := api.GetTiddlerByName(tiddlerTitle)
 
@@ -44,6 +45,7 @@ func Dispatch(log logger.Logger) {
 			// Prompt the user for the tiddler
 			tidtext = cfg.PromptTiddlerText()
 		}
+		tidtext = cfg.Get("tags."+block+".begin") + tidtext + cfg.Get("tags."+block+".end")
 		if tiddler.Title != "" {
 			fulltext := tiddler.Text + "\n" + tidtext
 			api.UpdateTiddler(tiddler.Title, fulltext)
