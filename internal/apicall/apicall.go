@@ -74,12 +74,12 @@ func (a *APICall) makeRequest(method string, url string, body io.Reader) *http.R
 
 	req, _ := http.NewRequest(method, url, body)
 
-	a.log.Info("makeRequest() :: " + method + " " + url)
+	//a.log.Info("makeRequest() :: " + method + " " + url)
 	req.SetBasicAuth(a.config.Get(config.Username), a.config.Get(config.Password))
 	req.Header.Set("Content-Type", "application/json")
 	// This is used for "authentication" by tiddlywiki (Major pain to figure out)
 	req.Header.Add("X-Requested-With", "TiddlyWiki")
-	a.log.Info("makeRequest() :: req ", req)
+	//a.log.Info("makeRequest() :: req ", req)
 	resp, err := a.client.Do(req)
 	if err != nil {
 		a.log.Fatal(err)
