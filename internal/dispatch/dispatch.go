@@ -3,6 +3,7 @@ package dispatch
 import (
 	//"fmt"
 	"tiddly-cli/internal/apicall"
+	"tiddly-cli/internal/clipboard"
 	"tiddly-cli/internal/config"
 	"tiddly-cli/internal/logger"
 )
@@ -34,20 +35,21 @@ func Dispatch(log logger.Logger) {
 		api := apicall.New(log, cfg)
 
 		tiddler := api.GetTiddlerByName(tiddlerTitle)
-		if tiddler.Title != "" {
 
-			log.Info("Tiddler found", tiddler.Text)
-
-			addtext := cfg.PromptTiddlerText()
-			newtext := tiddler.Text + "\n" + addtext
-			api.UpdateTiddler(tiddler.Title, newtext)
+		tidtext := ""
+		if cfg.FlagShouldPaste() {
+			// Use the clipboard contents for the tiddler
+			tidtext = clipboard.Paste(log)
 		} else {
-
-			log.Info("NEW TIDDLER")
-			text := cfg.PromptTiddlerText()
+			// Prompt the user for the tiddler
+			tidtext = cfg.PromptTiddlerText()
+		}
+		if tiddler.Title != "" {
+			fulltext := tiddler.Text + "\n" + tidtext
+			api.UpdateTiddler(tiddler.Title, fulltext)
+		} else {
 			creator := cfg.Get(config.Username)
-			newtiddler := api.AddNewTiddler(tiddlerTitle, creator, text)
-			log.Info("Result of put?", newtiddler)
+			api.AddNewTiddler(tiddlerTitle, creator, tidtext)
 		}
 
 		// The first argument is the journal entry
