@@ -17,70 +17,31 @@ type setting struct {
 	defaultvalue string
 }
 
-const (
-	// URL config setting
-	URL = "URL"
-	// TitleTemplate config setting
-	TitleTemplate = "TitleTemplate"
-	// Username config setting
-	Username = "Username"
-	// SavePassword config setting
-	SavePassword = "SavePassword"
-	// Password config setting
-	Password = "Password"
-	// Yes definition
-	Yes = "yes"
-	// No Definition
-	No = "no"
-	// CodeBlockBegin is the text to add before a code block
-	CodeBlockBegin = "CodeBlockBegin"
-	// CodeBlockEnd is the text to add after a code block
-	CodeBlockEnd = "CodeBlockEnd"
-
-	CodeBlockBegin = "CodeBlockBegin"
-	CodeBlockEnd = "CodeBlockEnd"
-	BulletListItemBegin = "BulletListItemBegin"
-	BulletListItemEnd = "BulletListItemEnd"
-	NumberListItemBegin = "NumberListItemBegin"
-	NumberListItemEnd = "NumberListItemEnd"
-	QuoteBegin = "QuoteBegin"
-	QuoteEnd = "QuoteEnd"
-	H1Begin = "H1Begin"
-	H1End = "H1End"
-	H2Begin = "H2Begin"
-	H2End = "H2End"
-	H3Begin = "H3Begin"
-	H3End = "H3End"
-	H4Begin = "H4Begin"
-	H4End = "H4End"
-	H5Begin = "H5Begin"
-	H5End = "H5End"
-)
-
 var defaults = map[string]setting{
 	URL:           {"string", "https://"},
 	TitleTemplate: {"string", "YYYY-0MM-0DD Journal"},
 	Username:      {"string", ""},
 	SavePassword:  {"string", "N"},
 	Password:      {"string", ""},
-	CodeBlockBegin: {"string", "\n\n```\n"}
-	CodeBlockEnd: {"string", "\n```\n\n"}
-	BulletListItemBegin: {"string", "\n* "}
-	BulletListItemEnd: {"string", "\n"}
-	NumberListItemBegin: {"string", "\n# "}
-	NumberListItemEnd: {"string", "\n"}
-	QuoteBegin: {"string", "\n\n<<<\n"}
-	QuoteEnd: {"string", "\n<<<\n\n"}
-	H1Begin: {"string", "! "}
-	H1End: {"string", "\n"}
-	H2Begin: {"string", "!! "}
-	H2End: {"string", "\n"}
-	H3Begin: {"string", "!!! "}
-	H3End: {"string", "\n"}
-	H4Begin: {"string", "!!!! "}
-	H4End: {"string", "\n"}
-	H5Begin: {"string", "!!!!! "}
-	H5End: {"string", "\n"}
+}
+
+type BlockParts struct {
+	Begin string
+	End   string
+}
+
+// Blocks define a slice of blocks for tiddlers
+var Blocks = map[string]BlockParts{
+	"code":   {Begin: "\n\n```\n", End: "\n```\n\n"},
+	"bullet": {Begin: "\n* ", End: "\n"},
+	"number": {Begin: "\n# ", End: "\n"},
+	"quote":  {Begin: "\n\n<<<\n", End: "\n<<<\n\n"},
+	"h1":     {Begin: "! ", End: "\n"},
+	"h2":     {Begin: "!! ", End: "\n"},
+	"h3":     {Begin: "!!! ", End: "\n"},
+	"h4":     {Begin: "!!!! ", End: "\n"},
+	"h5":     {Begin: "!!!!! ", End: "\n"},
+	"custom": {Begin: "!!!!! ", End: "\n"},
 }
 
 // Config is a struct for the configuration interface
@@ -102,6 +63,13 @@ func New(log logger.Logger) *Config {
 func (c *Config) initializeDefaults() {
 	for key, setting := range defaults {
 		c.viper.SetDefault(key, setting.defaultvalue)
+	}
+
+	c.viper.SetDefault("tags", nil)
+	for key, parts := range Blocks {
+		c.viper.SetDefault("tags."+key, nil)
+		c.viper.SetDefault("tags."+key+".begin", parts.Begin)
+		c.viper.SetDefault("tags."+key+".end", parts.End)
 	}
 }
 
