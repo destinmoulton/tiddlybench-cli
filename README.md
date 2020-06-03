@@ -91,8 +91,10 @@ You can add info to two types of tiddlers:
 
 You can configure the tiddlers (either Inbox or Journal) to use date and time string substitutions.
 
+| Token | Substituted Value                  |
+| ----- | ---------------------------------- |
 | `DDD` | Day of week in full (eg, "Monday") |
-| `ddd` | Short day of week (eg, "Mon") |
+| `ddd` | Short day of week (eg, "Mon")      |
 
 `DD` Day of month `0DD` Adds a leading zero `DDth` Adds a suffix `WW` ISO\-8601 week number of year `0WW` Adds a leading zero `MMM` Month in full (eg, "July") `mmm` Short month (eg, "Jul") `MM` Month number `0MM` Adds leading zero `YYYY` Full year `YY` Two digit year `wYYYY` Full year with respect to week number `wYY` Two digit year with respect to week number `hh` Hours `0hh` Adds a leading zero `hh12` Hours in 12 hour clock `0hh12` Hours in 12 hour clock with leading zero `mm` Minutes `0mm` Minutes with leading zero `ss` Seconds `0ss` Seconds with leading zero `XXX` Milliseconds `0XXX` Milliseconds with leading zero `am` or `pm` Lower case AM/PM indicator `AM` or `PM` Upper case AM/PM indicator `TZD` Timezone offset `\x` Used to escape a character that would otherwise have special meaning `[UTC]` Time\-shift the represented date to UTC. Must be at very start of format string
 [TiddlyWiki DateFormat Reference](https://tiddlywiki.com/static/DateFormat.html)
