@@ -32,6 +32,29 @@ const (
 	Yes = "yes"
 	// No Definition
 	No = "no"
+	// CodeBlockBegin is the text to add before a code block
+	CodeBlockBegin = "CodeBlockBegin"
+	// CodeBlockEnd is the text to add after a code block
+	CodeBlockEnd = "CodeBlockEnd"
+
+	CodeBlockBegin = "CodeBlockBegin"
+	CodeBlockEnd = "CodeBlockEnd"
+	BulletListItemBegin = "BulletListItemBegin"
+	BulletListItemEnd = "BulletListItemEnd"
+	NumberListItemBegin = "NumberListItemBegin"
+	NumberListItemEnd = "NumberListItemEnd"
+	QuoteBegin = "QuoteBegin"
+	QuoteEnd = "QuoteEnd"
+	H1Begin = "H1Begin"
+	H1End = "H1End"
+	H2Begin = "H2Begin"
+	H2End = "H2End"
+	H3Begin = "H3Begin"
+	H3End = "H3End"
+	H4Begin = "H4Begin"
+	H4End = "H4End"
+	H5Begin = "H5Begin"
+	H5End = "H5End"
 )
 
 var defaults = map[string]setting{
@@ -40,6 +63,24 @@ var defaults = map[string]setting{
 	Username:      {"string", ""},
 	SavePassword:  {"string", "N"},
 	Password:      {"string", ""},
+	CodeBlockBegin: {"string", "\n\n```\n"}
+	CodeBlockEnd: {"string", "\n```\n\n"}
+	BulletListItemBegin: {"string", "\n* "}
+	BulletListItemEnd: {"string", "\n"}
+	NumberListItemBegin: {"string", "\n# "}
+	NumberListItemEnd: {"string", "\n"}
+	QuoteBegin: {"string", "\n\n<<<\n"}
+	QuoteEnd: {"string", "\n<<<\n\n"}
+	H1Begin: {"string", "! "}
+	H1End: {"string", "\n"}
+	H2Begin: {"string", "!! "}
+	H2End: {"string", "\n"}
+	H3Begin: {"string", "!!! "}
+	H3End: {"string", "\n"}
+	H4Begin: {"string", "!!!! "}
+	H4End: {"string", "\n"}
+	H5Begin: {"string", "!!!!! "}
+	H5End: {"string", "\n"}
 }
 
 // Config is a struct for the configuration interface
