@@ -97,6 +97,10 @@ func (c *Config) setup() {
 	c.viper.AddConfigPath(configPath)
 	if err := c.viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+			if !c.doesConfigFileExist() {
+				c.createEmptyConfigFile()
+			}
+
 			// Create a config with defaults
 			c.Save()
 
@@ -135,12 +139,11 @@ func (c *Config) SetNested(one string, two string, three string, value string) {
 func (c *Config) Save() {
 	// Config file not found; ignore error if desired
 	if verr := c.viper.WriteConfig(); verr != nil {
-		c.log.Fatal("Unable to write the config file.", verr)
+		c.log.Fatal("Unable to write the config file. ", verr)
 	}
 }
 
 func (c *Config) setupConfigDir(dir string) {
-
 	if _, err := os.Stat(dir); err != nil {
 		if os.IsNotExist(err) {
 			// Folder
@@ -159,6 +162,14 @@ func (c *Config) setupConfigDir(dir string) {
 			c.log.Fatal(err)
 		}
 	}
+}
+
+func (c *Config) doesConfigFileExist() bool {
+	configFile := c.getFullConfigPath()
+	if _, err := os.Stat(configFile); err == nil {
+		return true
+	}
+	return false
 }
 
 func (c *Config) createEmptyConfigFile() {
