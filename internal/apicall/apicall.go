@@ -27,7 +27,7 @@ func New(log logger.Logger, config *config.Config) *APICall {
 }
 
 func (a *APICall) getFullURL(uri string) string {
-	return a.config.Get(config.URL) + uri
+	return a.config.Get(config.CKURL) + uri
 }
 
 // Get a URI
@@ -37,7 +37,7 @@ func (a *APICall) Get(uri string) string {
 	req, _ := http.NewRequest(http.MethodGet, url, nil)
 
 	a.log.Info("GET " + url)
-	req.SetBasicAuth(a.config.Get(config.Username), a.config.Get(config.Password))
+	req.SetBasicAuth(a.config.Get(config.CKUsername), a.config.Get(config.CKPassword))
 
 	resp, err := a.client.Do(req)
 	if err != nil {
@@ -75,7 +75,7 @@ func (a *APICall) makeRequest(method string, url string, body io.Reader) *http.R
 	req, _ := http.NewRequest(method, url, body)
 
 	//a.log.Info("makeRequest() :: " + method + " " + url)
-	req.SetBasicAuth(a.config.Get(config.Username), a.config.Get(config.Password))
+	req.SetBasicAuth(a.config.Get(config.CKUsername), a.config.Get(config.CKPassword))
 	req.Header.Set("Content-Type", "application/json")
 	// This is used for "authentication" by tiddlywiki (Major pain to figure out)
 	req.Header.Add("X-Requested-With", "TiddlyWiki")
