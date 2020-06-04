@@ -33,27 +33,31 @@ func (p *Prompt) PromptForConfig() {
 		fmt.Println("That URL is unreachable")
 	}
 	username := p.promptUsername()
-	titletemplate := p.promptTitleTemplate(c.Get("TitleTemplate"))
-	savePassword := p.promptToSavePassword(c.Get("SavePassword"))
+	inboxTitle, inboxTags := p.promptDestination(config.CKInbox)
+	journalTitle, journalTags := p.promptDestination(config.CKJournal)
+	savePassword := p.promptToSavePassword()
 	password := ""
-	if savePassword == CKYes {
-		password = PromptForPassword()
+	if savePassword == config.CKYes {
+		password = p.PromptForPassword()
 	}
 
 	// Set the c values
 	if url != "" && username != "" {
-		c.Set(CKURL, url)
-		c.Set(TitleTemplate, titletemplate)
-		c.Set(Username, username)
-		c.Set(ShouldSavePassword, savePassword)
-		c.Set(Password, password)
-		c.Save()
+		p.config.Set(config.CKURL, url)
+		p.config.SetNested(config.CKDestinations, config.CKInbox, config.CKTitleTemplate, inboxTitle)
+		p.config.SetNested(config.CKDestinations, config.CKInbox, config.CKTags, inboxTags)
+		p.config.SetNested(config.CKDestinations, config.CKJournal, config.CKTitleTemplate, journalTitle)
+		p.config.SetNested(config.CKDestinations, config.CKJournal, config.CKTags, journalTags)
+		p.config.Set(config.CKUsername, username)
+		p.config.Set(config.CKShouldSavePassword, savePassword)
+		p.config.Set(config.CKPassword, password)
+		p.config.Save()
 	}
 }
 
 func (p *Prompt) promptURL() string {
 
-	dflt := p.config.Get(p.config.CKURL)
+	dflt := p.config.Get(config.CKURL)
 	validate := func(input string) error {
 
 		if !util.IsURL(input) {
@@ -79,7 +83,7 @@ func (p *Prompt) promptURL() string {
 
 func (p *Prompt) promptUsername() string {
 
-	dflt := p.config.Get(p.config.CKUsername)
+	dflt := p.config.Get(config.CKUsername)
 	prompt := promptui.Prompt{
 		Label:   "Username",
 		Default: dflt,
@@ -96,8 +100,8 @@ func (p *Prompt) promptUsername() string {
 func (p *Prompt) promptDestination(dest string) (string, string) {
 
 	destTitle := strings.Title(dest)
-	currentTitle := p.config.GetNested(p.config.CKDestinations, dest, p.config.CKTitleTemplate)
-	currentTags := p.config.GetNested(p.config.CKDestinations, dest, p.config.CKTags)
+	currentTitle := p.config.GetNested(config.CKDestinations, dest, config.CKTitleTemplate)
+	currentTags := p.config.GetNested(config.CKDestinations, dest, config.CKTags)
 
 	titleprompt := promptui.Prompt{
 		Label:   destTitle + " Title Template",
@@ -123,7 +127,7 @@ func (p *Prompt) promptDestination(dest string) (string, string) {
 }
 
 func (p *Prompt) promptToSavePassword() string {
-	dflt := p.config.Get(p.config.CKShouldSavePassword)
+	dflt := p.config.Get(config.CKShouldSavePassword)
 	prompt := promptui.Prompt{
 		Label:     "Save Password?",
 		IsConfirm: true,
@@ -133,12 +137,13 @@ func (p *Prompt) promptToSavePassword() string {
 	result, err := prompt.Run()
 
 	if result == "y" {
-		result = Yes
+		result = config.CKYes
 	} else {
-		result = No
+		result = config.CKNo
 	}
 
 	if err != nil {
+		p.log.Fatal("Prompt Error. Unable to get the Save Password option")
 	}
 
 	return result
@@ -162,20 +167,22 @@ func (p *Prompt) PromptForPassword() string {
 
 // PromptTiddlerTitle asks the user for the title of the
 // tiddler to add
-func (p *Prompt) PromptTiddlerTitle() string {
+func (p *Prompt) PromptTiddlerTitle(dest string) string {
 
-	title := c.Get("TitleTemplate")
+	destTitle := strings.Title(dest)
+
+	title := p.config.GetNested(config.CKDestinations, dest, config.CKTitleTemplate)
 	title = util.ConvertTiddlyTimeToGo(title)
 	title = time.Now().Format(title)
 
 	prompt := promptui.Prompt{
-		Label:   "Tiddler Title",
+		Label:   destTitle + " Tiddler Title",
 		Default: title,
 	}
 
 	finaltitle, err := prompt.Run()
 	if err != nil {
-		c.log.Fatal("The prompt failed to process the title")
+		p.log.Fatal("Prompt Error. The prompt failed to process the " + dest + " tiddler title")
 	}
 
 	return finaltitle
@@ -191,7 +198,7 @@ func (p *Prompt) PromptTiddlerText() string {
 
 	text, err := prompt.Run()
 	if err != nil {
-		c.log.Fatal("The prompt failed to process the text")
+		p.log.Fatal("Prompt Error. The prompt failed to process the tiddler text")
 	}
 
 	return text
