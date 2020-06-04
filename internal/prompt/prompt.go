@@ -18,7 +18,7 @@ type Prompt struct {
 }
 
 // New returns a new Prompt
-func New(config *config.Config, log logger.Logger) *Prompt {
+func New(log logger.Logger, config *config.Config) *Prompt {
 	p := new(Prompt)
 	p.log = log
 	p.config = config

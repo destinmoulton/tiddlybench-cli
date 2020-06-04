@@ -23,14 +23,14 @@ func Dispatch(log logger.Logger) {
 
 	cfg = config.New(log)
 	pipe = piper.New(log)
-	prompt = prompter.New(cfg, log)
+	prompt = prompter.New(log, cfg)
+	api := apicall.New(log, cfg)
 
 	cliflags.Setup()
 
 	if pipe.IsPipeSet() {
 		// Piping breaks the ability to use the prompt
-		dispatchForPipe()
-		return
+		checkRequirementsForPipe()
 	}
 
 	if cliflags.ShouldPromptForConfig() || !cfg.IsConfigFileSet() {
@@ -53,10 +53,9 @@ func Dispatch(log logger.Logger) {
 		}
 
 		tiddlerTitle := getTiddlerTitleFromFlags()
-		if tiddlerTitle == "" {
+		if tiddlerTitle == "" && !pipe.IsPipeSet() {
 			tiddlerTitle = prompt.PromptTiddlerTitle(tiddlerTitle)
 		}
-		api := apicall.New(log, cfg)
 		block := cliflags.GetSelectedBlock()
 
 		currentTiddler := api.GetTiddlerByName(tiddlerTitle)
@@ -85,7 +84,7 @@ func Dispatch(log logger.Logger) {
 	}
 }
 
-func dispatchForPipe() {
+func checkRequirementsForPipe() {
 	// Pipe is set, so can't use
 	// any of the prompt methods
 
