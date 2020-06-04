@@ -1,4 +1,4 @@
-package pipe
+package piper
 
 import (
 	"bufio"
@@ -28,6 +28,7 @@ func New(log logger.Logger) *Pipe {
 
 func (p *Pipe) setup() {
 	f, err := os.Stdin.Stat()
+
 	if err != nil {
 		p.log.Fatal("Error reading the pipe from stdin")
 	}
@@ -48,6 +49,8 @@ func (p *Pipe) readData() {
 		}
 		data = append(data, input)
 	}
+
+	p.log.Info("Pipe read complete")
 }
 
 // IsPipeSet returns bool for checking if piping
@@ -57,5 +60,6 @@ func (p *Pipe) IsPipeSet() bool {
 
 // Get returns the string of stdin data
 func (p *Pipe) Get() string {
+	p.log.Info(data)
 	return string(data)
 }
