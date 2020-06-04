@@ -1,61 +1,145 @@
 package dispatch
 
 import (
-	//"fmt"
+	"fmt"
+	"os"
 	"tiddly-cli/internal/apicall"
+	"tiddly-cli/internal/cliflags"
 	"tiddly-cli/internal/clipboard"
 	"tiddly-cli/internal/config"
 	"tiddly-cli/internal/logger"
+	"tiddly-cli/internal/piper"
+	prompter "tiddly-cli/internal/prompt"
+)
+
+var (
+	cfg    *config.Config
+	pipe   *piper.Pipe
+	prompt *prompter.Prompt
 )
 
 // Dispatch the right activity for the app
 func Dispatch(log logger.Logger) {
 
-	cfg := config.New(log)
-	cfg.CheckCLIFlags()
-	if cfg.ShouldPromptForConfig() || !cfg.IsConfigFileSet() {
+	cfg = config.New(log)
+	pipe = piper.New(log)
+	prompt = prompter.New(cfg, log)
+
+	cliflags.Setup()
+
+	if pipe.IsPipeSet() {
+		// Piping breaks the ability to use the prompt
+		dispatchForPipe()
+		return
+	}
+
+	if cliflags.ShouldPromptForConfig() || !cfg.IsConfigFileSet() {
 		// Prompt to configure the username/password
-		cfg.PromptForConfig()
+		prompt.PromptForConfig()
+		os.Exit(0)
 	}
 
 	if cfg.IsConfigFileSet() {
 
-		savepassword := cfg.Get("SavePassword")
+		savepassword := cfg.Get(config.CKShouldSavePassword)
 
-		if savepassword == config.No {
+		if savepassword == config.CKNo {
 			// Password is not saved
-			password := config.PromptForPassword()
-			cfg.Set(config.Password, password)
+			password := prompt.PromptForPassword()
+			cfg.Set(config.CKPassword, password)
 
-			// DO NOT c.Save after this point as we don't want to
+			// DO NOT cfg.Save after this point as we don't want to
 			// write the password to the file per user request
 		}
 
-		tiddlerTitle := cfg.PromptTiddlerTitle()
+		tiddlerTitle := getTiddlerTitleFromFlags()
+		if tiddlerTitle == "" {
+			tiddlerTitle = prompt.PromptTiddlerTitle(tiddlerTitle)
+		}
 		api := apicall.New(log, cfg)
-		block := cfg.GetSelectedBlock()
+		block := cliflags.GetSelectedBlock()
 
-		tiddler := api.GetTiddlerByName(tiddlerTitle)
+		currentTiddler := api.GetTiddlerByName(tiddlerTitle)
 
 		tidtext := ""
-		if cfg.FlagShouldPaste() {
+		if cliflags.ShouldPaste() {
 			// Use the clipboard contents for the tiddler
 			tidtext = clipboard.Paste(log)
 		} else {
 			// Prompt the user for the tiddler
-			tidtext = cfg.PromptTiddlerText()
+			tidtext = prompt.PromptTiddlerText()
 		}
-		tidtext = cfg.Get("tags."+block+".begin") + tidtext + cfg.Get("tags."+block+".end")
-		if tiddler.Title != "" {
-			fulltext := tiddler.Text + "\n" + tidtext
-			api.UpdateTiddler(tiddler.Title, fulltext)
+
+		//Setup the block
+		beginBlock := cfg.GetNested(config.CKBlocks, block, config.CKBegin)
+		endBlock := cfg.GetNested(config.CKBlocks, block, config.CKEnd)
+		tidtext = beginBlock + tidtext + endBlock
+		if currentTiddler.Title != "" {
+			fulltext := currentTiddler.Text + "\n" + tidtext
+			api.UpdateTiddler(currentTiddler.Title, fulltext)
 		} else {
-			creator := cfg.Get(config.Username)
+			creator := cfg.Get(config.CKUsername)
 			api.AddNewTiddler(tiddlerTitle, creator, tidtext)
 		}
 
-		// The first argument is the journal entry
-		// fmt.Println("Journal entry")
-		// fmt.Println(os.Args[1])
+	}
+}
+
+func dispatchForPipe() {
+	// Pipe is set, so can't use
+	// any of the prompt methods
+
+	// Must be configured
+	requireConfigFile()
+
+	// Must have password
+	requirePasswordFlag()
+
+	// Must have Inbox, Journal, or -t flag
+	requireTiddlerTitleFlag()
+}
+
+func getTiddlerTitleFromFlags() string {
+	tiddlerTitle := cliflags.GetTiddlerTitle()
+	if tiddlerTitle != "" {
+		return tiddlerTitle
+	}
+
+	sendTo := cliflags.GetSendTo()
+	if sendTo != "" {
+		return sendTo
+	}
+	return ""
+}
+
+func requireConfigFile() {
+
+	if !cfg.IsConfigFileSet() {
+		fmt.Println("Config file has not been set.")
+		fmt.Println("Run tikli with -c option to configure")
+		os.Exit(1)
+	}
+}
+
+func requirePasswordFlag() {
+	if !cfg.IsPasswordSaved() {
+		fmt.Println("Password is required, but it is not saved in the config file.")
+		fmt.Println("Add the password to the command line arguments: tikli --password 'YourPass'")
+		os.Exit(1)
+	}
+}
+
+func requireTiddlerTitleFlag() {
+	hasTiddlerTitle := cliflags.GetTiddlerTitle() != ""
+	hasSendTo := cliflags.GetSendTo() != ""
+	if hasTiddlerTitle && hasSendTo {
+		fmt.Println("You have set too many destination tiddlers.")
+		fmt.Println("Include just one of -i, -j, or -t.")
+		os.Exit(1)
+	}
+	if !hasTiddlerTitle && !hasSendTo {
+		fmt.Println("You must include a destination tiddler.")
+		fmt.Println("Include -i (inbox), -j (journal), or -t (custom tiddler).")
+		os.Exit(1)
 	}
 }
