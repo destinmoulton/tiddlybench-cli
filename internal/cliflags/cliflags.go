@@ -22,7 +22,7 @@ func Setup() {
 	flag.BoolVarP(&shouldRunConfig, "config", "c", false, "Run the configuration prompt.")
 	flag.BoolVarP(&shouldPaste, "paste", "p", false, "Paste the contents of the clipboard.")
 	flag.BoolVarP(&sendToInbox, "inbox", "i", false, "Add to Inbox")
-	flag.BoolVarP(&sendToJournal, "inbox", "i", false, "Add to Journal")
+	flag.BoolVarP(&sendToJournal, "journal", "j", false, "Add to Journal")
 	flag.StringVarP(&tiddlerTitle, "tiddler", "t", "", "tiddler to create or add to")
 	flag.StringVar(&password, "password", "", "password to use for authentication")
 
