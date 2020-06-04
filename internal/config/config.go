@@ -116,7 +116,7 @@ func (c *Config) Get(key string) string {
 	return c.viper.GetString(key)
 }
 
-// GetNested returns a nested config valudflt stringe
+// GetNested returns a nested config value string
 func (c *Config) GetNested(one string, two string, three string) string {
 	return c.viper.GetString(one + "." + two + "." + three)
 }
@@ -124,6 +124,11 @@ func (c *Config) GetNested(one string, two string, three string) string {
 // Set assigns a config value to a key
 func (c *Config) Set(key string, value string) {
 	c.viper.Set(key, value)
+}
+
+// SetNested sets a nested config value
+func (c *Config) SetNested(one string, two string, three string, value string) {
+	c.viper.Set(one+"."+two+"."+three, value)
 }
 
 // Save the config to the file
