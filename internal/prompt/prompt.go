@@ -32,25 +32,29 @@ func (p *Prompt) PromptForConfig() {
 	if !util.TestURL(url) {
 		fmt.Println("That URL is unreachable")
 	}
+
+	// User auth prompts
 	username := p.promptUsername()
-	inboxTitle, inboxTags := p.promptDestination(config.CKInbox)
-	journalTitle, journalTags := p.promptDestination(config.CKJournal)
 	savePassword := p.promptToSavePassword()
 	password := ""
 	if savePassword == config.CKYes {
 		password = p.PromptForPassword()
 	}
 
+	// destination prompts
+	inboxTitle, inboxTags := p.promptDestination(config.CKInbox)
+	journalTitle, journalTags := p.promptDestination(config.CKJournal)
+
 	// Set the c values
 	if url != "" && username != "" {
 		p.config.Set(config.CKURL, url)
+		p.config.Set(config.CKUsername, username)
+		p.config.Set(config.CKShouldSavePassword, savePassword)
+		p.config.Set(config.CKPassword, password)
 		p.config.SetNested(config.CKDestinations, config.CKInbox, config.CKTitleTemplate, inboxTitle)
 		p.config.SetNested(config.CKDestinations, config.CKInbox, config.CKTags, inboxTags)
 		p.config.SetNested(config.CKDestinations, config.CKJournal, config.CKTitleTemplate, journalTitle)
 		p.config.SetNested(config.CKDestinations, config.CKJournal, config.CKTags, journalTags)
-		p.config.Set(config.CKUsername, username)
-		p.config.Set(config.CKShouldSavePassword, savePassword)
-		p.config.Set(config.CKPassword, password)
 		p.config.Save()
 	}
 }
