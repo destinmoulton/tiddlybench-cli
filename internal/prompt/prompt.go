@@ -171,22 +171,20 @@ func (p *Prompt) PromptForPassword() string {
 
 // PromptTiddlerTitle asks the user for the title of the
 // tiddler to add
-func (p *Prompt) PromptTiddlerTitle(dest string) string {
+func (p *Prompt) PromptTiddlerTitle(currentTitle string) string {
 
-	destTitle := strings.Title(dest)
-
-	title := p.config.GetNested(config.CKDestinations, dest, config.CKTitleTemplate)
+	title := currentTitle
 	title = util.ConvertTiddlyTimeToGo(title)
 	title = time.Now().Format(title)
 
 	prompt := promptui.Prompt{
-		Label:   destTitle + " Tiddler Title",
+		Label:   "Tiddler Title",
 		Default: title,
 	}
 
 	finaltitle, err := prompt.Run()
 	if err != nil {
-		p.log.Fatal("Prompt Error. The prompt failed to process the " + dest + " tiddler title")
+		p.log.Fatal("Prompt Error. The prompt failed to process the tiddler title")
 	}
 
 	return finaltitle
