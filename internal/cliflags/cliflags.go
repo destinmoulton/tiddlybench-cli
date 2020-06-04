@@ -14,15 +14,17 @@ var (
 	tiddlerTitle         = ""
 	defaultSelectedBlock = "bullet"
 	password             = ""
+	addText              = ""
 )
 
 // Setup configures the cli flags
 func Setup() {
 
+	flag.StringVarP(&tiddlerTitle, "add", "a", "", "Text to add to tiddler")
 	flag.BoolVarP(&shouldRunConfig, "config", "c", false, "Run the configuration prompt.")
-	flag.BoolVarP(&shouldPaste, "paste", "p", false, "Paste the contents of the clipboard.")
 	flag.BoolVarP(&sendToInbox, "inbox", "i", false, "Add to Inbox")
 	flag.BoolVarP(&sendToJournal, "journal", "j", false, "Add to Journal")
+	flag.BoolVarP(&shouldPaste, "paste", "p", false, "Paste the contents of the clipboard.")
 	flag.StringVarP(&tiddlerTitle, "tiddler", "t", "", "tiddler to create or add to")
 	flag.StringVar(&password, "password", "", "password to use for authentication")
 
@@ -72,4 +74,14 @@ func GetSendTo() string {
 		return "journal"
 	}
 	return ""
+}
+
+// GetAddText returns the string to add set by the -a flag
+func GetAddText() string {
+	return addText
+}
+
+// GetPassword returns the --password flag contents
+func GetPassword() string {
+	return password
 }
