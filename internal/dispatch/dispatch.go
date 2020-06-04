@@ -54,14 +54,16 @@ func Dispatch(log logger.Logger) {
 
 		tiddlerTitle := getTiddlerTitleFromFlags()
 		if tiddlerTitle == "" && !pipe.IsPipeSet() {
+			// Prompt for the tiddler title
 			tiddlerTitle = prompt.PromptTiddlerTitle(tiddlerTitle)
 		}
-		block := cliflags.GetSelectedBlock()
 
 		currentTiddler := api.GetTiddlerByName(tiddlerTitle)
 
 		tidtext := ""
-		if cliflags.ShouldPaste() {
+		if pipe.IsPipeSet() {
+
+		} else if cliflags.ShouldPaste() {
 			// Use the clipboard contents for the tiddler
 			tidtext = clipboard.Paste(log)
 		} else {
@@ -69,10 +71,9 @@ func Dispatch(log logger.Logger) {
 			tidtext = prompt.PromptTiddlerText()
 		}
 
-		//Setup the block
-		beginBlock := cfg.GetNested(config.CKBlocks, block, config.CKBegin)
-		endBlock := cfg.GetNested(config.CKBlocks, block, config.CKEnd)
-		tidtext = beginBlock + tidtext + endBlock
+		// Wrap the text in the selected block
+		tidtext = wrapTextInBlock(tidtext)
+
 		if currentTiddler.Title != "" {
 			fulltext := currentTiddler.Text + "\n" + tidtext
 			api.UpdateTiddler(currentTiddler.Title, fulltext)
@@ -82,6 +83,13 @@ func Dispatch(log logger.Logger) {
 		}
 
 	}
+}
+
+func wrapTextInBlock(txt string) string {
+	block := cliflags.GetSelectedBlock()
+	beginBlock := cfg.GetNested(config.CKBlocks, block, config.CKBegin)
+	endBlock := cfg.GetNested(config.CKBlocks, block, config.CKEnd)
+	return beginBlock + tidtext + endBlock
 }
 
 func checkRequirementsForPipe() {
