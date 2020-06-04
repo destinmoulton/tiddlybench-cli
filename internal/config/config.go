@@ -12,26 +12,30 @@ var configName = "config"
 var configType = "json"
 var configExt = "json"
 
-type setting struct {
-	datatype     string
-	defaultvalue string
+type destination struct {
+	Tags          string
+	TitleTemplate string
 }
 
-var defaults = map[string]setting{
-	URL:           {"string", "https://"},
-	TitleTemplate: {"string", "YYYY-0MM-0DD Journal"},
-	Username:      {"string", ""},
-	SavePassword:  {"string", "N"},
-	Password:      {"string", ""},
+var destinationDefaults = map[string]destination{
+	CKInbox:   {Tags: "", TitleTemplate: "Inbox"},
+	CKJournal: {Tags: "journal", TitleTemplate: "YYYY-0MM-0DD Journal"},
 }
 
-type BlockParts struct {
+var defaults = map[string]string{
+	CKURL:                "",
+	CKUsername:           "",
+	CKShouldSavePassword: CKNo,
+	CKPassword:           "",
+}
+
+type blockParts struct {
 	Begin string
 	End   string
 }
 
 // Blocks define a slice of blocks for tiddlers
-var Blocks = map[string]BlockParts{
+var Blocks = map[string]blockParts{
 	"code":   {Begin: "\n\n```\n", End: "\n```\n\n"},
 	"bullet": {Begin: "\n* ", End: "\n"},
 	"number": {Begin: "\n# ", End: "\n"},
@@ -61,37 +65,26 @@ func New(log logger.Logger) *Config {
 }
 
 func (c *Config) initializeDefaults() {
-	for key, setting := range defaults {
-		c.viper.SetDefault(key, setting.defaultvalue)
+	// Basic defaults
+	for key, def := range defaults {
+		c.viper.SetDefault(key, def)
 	}
 
-	c.viper.SetDefault("tags", nil)
+	// Destination defaults
+	c.viper.SetDefault(CKDestinations, nil)
+	for key, def := range destinationDefaults {
+		c.viper.SetDefault(CKDestinations+"."+key, nil)
+		c.viper.SetDefault(CKDestinations+"."+key+"."+CKTags, def.Tags)
+		c.viper.SetDefault(CKDestinations+"."+key+"."+CKTitleTemplate, def.TitleTemplate)
+	}
+
+	// Block defaults
+	c.viper.SetDefault(CKBlocks, nil)
 	for key, parts := range Blocks {
-		c.viper.SetDefault("tags."+key, nil)
-		c.viper.SetDefault("tags."+key+".begin", parts.Begin)
-		c.viper.SetDefault("tags."+key+".end", parts.End)
+		c.viper.SetDefault(CKBlocks+"."+key, nil)
+		c.viper.SetDefault(CKBlocks+"."+key+"."+CKBegin, parts.Begin)
+		c.viper.SetDefault(CKBlocks+"."+key+"."+CKEnd, parts.End)
 	}
-}
-
-// IsConfigFileSet returns boolean if the config file is setup
-func (c *Config) IsConfigFileSet() bool {
-	url := c.Get("URL")
-
-	// May need to alter what is checked
-	if url != "" {
-		return true
-	}
-	return false
-}
-
-// Get returns a config value by key
-func (c *Config) Get(key string) string {
-	return c.viper.GetString(key)
-}
-
-// Set assigns a config value to a key
-func (c *Config) Set(key string, value string) {
-	c.viper.Set(key, value)
 }
 
 func (c *Config) setup() {
@@ -118,9 +111,23 @@ func (c *Config) setup() {
 	}
 }
 
+// Get returns a config value by key
+func (c *Config) Get(key string) string {
+	return c.viper.GetString(key)
+}
+
+// GetNested returns a nested config valudflt stringe
+func (c *Config) GetNested(one string, two string, three string) string {
+	return c.viper.GetString(one + "." + two + "." + three)
+}
+
+// Set assigns a config value to a key
+func (c *Config) Set(key string, value string) {
+	c.viper.Set(key, value)
+}
+
 // Save the config to the file
 func (c *Config) Save() {
-
 	// Config file not found; ignore error if desired
 	if verr := c.viper.WriteConfig(); verr != nil {
 		c.log.Fatal("Unable to write the config file.", verr)
@@ -178,4 +185,22 @@ func (c *Config) getConfigPath() string {
 	}
 
 	return path.Join(configDir, configSubdir)
+}
+
+// IsConfigFileSet returns boolean if the config file is setup
+func (c *Config) IsConfigFileSet() bool {
+	url := c.Get(CKURL)
+
+	// May need to alter what is checked
+	if url != "" {
+		return true
+	}
+	return false
+}
+
+// IsPasswordSaved returns boolean to determine if password is set in config
+func (c *Config) IsPasswordSaved() bool {
+	shouldSave := c.Get(CKShouldSavePassword) == CKYes
+	isPassword := len(c.Get(CKPassword)) > 0
+	return shouldSave && isPassword
 }
