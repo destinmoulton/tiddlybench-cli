@@ -107,7 +107,7 @@ func getTiddlerTitleFromFlags() string {
 
 	sendTo := cliflags.GetSendTo()
 	if sendTo != "" {
-		return sendTo
+		return cfg.GetNested(config.CKDestinations, sendTo, config.CKTitleTemplate)
 	}
 	return ""
 }
