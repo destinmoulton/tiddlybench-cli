@@ -30,6 +30,25 @@ func (a *APICall) getFullURL(uri string) string {
 	return a.config.Get(config.CKURL) + uri
 }
 
+// IsValidConnection checks the server status
+func (a *APICall) IsValidConnection() bool {
+	uri := "/status"
+	url := a.getFullURL(uri)
+
+	req, _ := http.NewRequest(http.MethodGet, url, nil)
+	req.SetBasicAuth(a.config.Get(config.CKUsername), a.config.Get(config.CKPassword))
+
+	resp, err := a.client.Do(req)
+	if err != nil {
+		a.log.Fatal(err)
+	}
+
+	if resp.StatusCode == 200 {
+		return true
+	}
+	return false
+}
+
 // Get a URI
 func (a *APICall) Get(uri string) string {
 	url := a.getFullURL(uri)
@@ -60,9 +79,9 @@ func (a *APICall) Put(uri string, tiddler MinimalSingleTiddler) bool {
 
 	resp := a.makeRequest(http.MethodPut, url, bytes.NewBuffer(json))
 
-	a.log.Info(bytes.NewBuffer(json))
+	//a.log.Info(bytes.NewBuffer(json))
 
-	a.log.Info(resp)
+	//a.log.Info(resp)
 
 	if resp.StatusCode == 204 {
 		return true
