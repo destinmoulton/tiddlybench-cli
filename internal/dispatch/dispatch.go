@@ -7,6 +7,7 @@ import (
 	"tiddly-cli/internal/cliflags"
 	"tiddly-cli/internal/clipboard"
 	"tiddly-cli/internal/config"
+	"tiddly-cli/internal/editor"
 	"tiddly-cli/internal/logger"
 	"tiddly-cli/internal/piper"
 	prompter "tiddly-cli/internal/prompt"
@@ -63,6 +64,17 @@ func Dispatch(log logger.Logger) {
 		} else {
 			// Prompt the user for the tiddler
 			tidtext = prompt.PromptTiddlerText()
+		}
+
+		if cliflags.ShouldUseEditor() {
+			prefEd := editor.GetPreferredEditorFromEnvironment
+			textBytes, eerr := editor.CaptureInputFromEditor(tidtext, prefEd)
+			if eerr != nil {
+				fmt.Println("Unable to use the editor.")
+				fmt.Println(eerr)
+				os.Exit(1)
+			}
+			tidtext = string(textBytes)
 		}
 
 		// Wrap the text in the selected block
