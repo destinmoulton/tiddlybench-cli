@@ -16,6 +16,7 @@ var (
 	cfg    *config.Config
 	pipe   *piper.Pipe
 	prompt *prompter.Prompt
+	api    *apicall.APICall
 )
 
 // Dispatch the right activity for the app
@@ -23,8 +24,8 @@ func Dispatch(log logger.Logger) {
 
 	cfg = config.New(log)
 	pipe = piper.New(log)
+	api = apicall.New(log, cfg)
 	prompt = prompter.New(log, cfg)
-	api := apicall.New(log, cfg)
 
 	cliflags.Setup()
 
@@ -40,17 +41,8 @@ func Dispatch(log logger.Logger) {
 	}
 
 	if cfg.IsConfigFileSet() {
-
-		savepassword := cfg.Get(config.CKShouldSavePassword)
-
-		if savepassword == config.CKNo {
-			// Password is not saved
-			password := prompt.PromptForPassword()
-			cfg.Set(config.CKPassword, password)
-
-			// DO NOT cfg.Save after this point as we don't want to
-			// write the password to the file per user request
-		}
+		// Verify the password and test the connection
+		verifyPasswordAndConnection()
 
 		tiddlerTitle := getTiddlerTitleFromFlags()
 		if tiddlerTitle == "" && !pipe.IsPipeSet() {
@@ -62,7 +54,9 @@ func Dispatch(log logger.Logger) {
 
 		tidtext := ""
 		if pipe.IsPipeSet() {
-
+			tidtext = pipe.Get()
+		} else if cliflags.IsAddTextSet() {
+			tidtext = cliflags.GetAddText()
 		} else if cliflags.ShouldPaste() {
 			// Use the clipboard contents for the tiddler
 			tidtext = clipboard.Paste(log)
@@ -74,14 +68,24 @@ func Dispatch(log logger.Logger) {
 		// Wrap the text in the selected block
 		tidtext = wrapTextInBlock(tidtext)
 
+		ok := false
+		method := ""
 		if currentTiddler.Title != "" {
+			method = "update"
 			fulltext := currentTiddler.Text + "\n" + tidtext
-			api.UpdateTiddler(currentTiddler.Title, fulltext)
+			ok = api.UpdateTiddler(currentTiddler.Title, fulltext)
 		} else {
+			method = "add"
 			creator := cfg.Get(config.CKUsername)
-			api.AddNewTiddler(tiddlerTitle, creator, tidtext)
+			ok = api.AddNewTiddler(tiddlerTitle, creator, tidtext)
 		}
 
+		if ok {
+			fmt.Println("Success.")
+			fmt.Println("'" + tiddlerTitle + "' was " + method + "ed.")
+		} else {
+			fmt.Println("Failed to " + method + " '" + tiddlerTitle + "'.")
+		}
 	}
 }
 
@@ -89,7 +93,33 @@ func wrapTextInBlock(txt string) string {
 	block := cliflags.GetSelectedBlock()
 	beginBlock := cfg.GetNested(config.CKBlocks, block, config.CKBegin)
 	endBlock := cfg.GetNested(config.CKBlocks, block, config.CKEnd)
-	return beginBlock + tidtext + endBlock
+	return beginBlock + txt + endBlock
+}
+
+func verifyPasswordAndConnection() {
+
+	if !cfg.IsPasswordSaved() {
+		// Password is not saved
+		if cliflags.IsPasswordSet() {
+			// The password flag is set so lets use that
+			passwordFromFlag := cliflags.GetPassword()
+			cfg.Set(config.CKPassword, passwordFromFlag)
+		} else if !pipe.IsPipeSet() {
+			// Prompt for a password
+			password := prompt.PromptForPassword()
+			cfg.Set(config.CKPassword, password)
+		}
+	}
+
+	if !api.IsValidConnection() {
+		url := cfg.Get(config.CKURL)
+		username := cfg.Get(config.CKUsername)
+		fmt.Println("Connection Error. The url, username, or password is incorrect")
+		fmt.Println("Configured URL: " + url)
+		fmt.Println("Configured Username: " + username)
+		fmt.Println("Run 'tikli -c' to reconfigure or try a different password.")
+		os.Exit(1)
+	}
 }
 
 func checkRequirementsForPipe() {
@@ -129,7 +159,7 @@ func requireConfigFile() {
 }
 
 func requirePasswordFlag() {
-	if !cfg.IsPasswordSaved() {
+	if !cfg.IsPasswordSaved() && !cliflags.IsPasswordSet() {
 		fmt.Println("Password is required, but it is not saved in the config file.")
 		fmt.Println("Add the password to the command line arguments: tikli --password 'YourPass'")
 		os.Exit(1)
