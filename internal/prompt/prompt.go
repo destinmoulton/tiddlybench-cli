@@ -194,7 +194,7 @@ func (p *Prompt) PromptTiddlerTitle(currentTitle string) string {
 func (p *Prompt) PromptTiddlerText() string {
 
 	prompt := promptui.Prompt{
-		Label:   "New Tiddler Text",
+		Label:   "Tiddler Text to Add",
 		Default: "",
 	}
 
