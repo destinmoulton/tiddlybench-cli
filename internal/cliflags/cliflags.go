@@ -1,6 +1,7 @@
 package cliflags
 
 import (
+	"fmt"
 	flag "github.com/spf13/pflag"
 	"tiddly-cli/internal/config"
 )
@@ -20,7 +21,7 @@ var (
 // Setup configures the cli flags
 func Setup() {
 
-	flag.StringVarP(&tiddlerTitle, "add", "a", "", "Text to add to tiddler")
+	flag.StringVarP(&addText, "add", "a", "", "Text to add to tiddler")
 	flag.BoolVarP(&shouldRunConfig, "config", "c", false, "Run the configuration prompt.")
 	flag.BoolVarP(&sendToInbox, "inbox", "i", false, "Add to Inbox")
 	flag.BoolVarP(&sendToJournal, "journal", "j", false, "Add to Journal")
@@ -81,7 +82,18 @@ func GetAddText() string {
 	return addText
 }
 
+// IsAddTextSet returns bool for whether the -a flag contains text
+func IsAddTextSet() bool {
+	fmt.Println("IsAddTextSet = ", GetAddText())
+	return len(GetAddText()) > 0
+}
+
 // GetPassword returns the --password flag contents
 func GetPassword() string {
 	return password
+}
+
+// IsPasswordSet checks whether the password flag has anything
+func IsPasswordSet() bool {
+	return len(GetPassword()) > 0
 }
