@@ -12,6 +12,7 @@ var (
 	isBlockSelected      = false
 	sendToInbox          = false
 	sendToJournal        = false
+	useEditor            = false
 	tiddlerTitle         = ""
 	defaultSelectedBlock = "bullet"
 	password             = ""
@@ -23,6 +24,7 @@ func Setup() {
 
 	flag.StringVarP(&addText, "add", "a", "", "Text to add to tiddler")
 	flag.BoolVarP(&shouldRunConfig, "config", "c", false, "Run the configuration prompt.")
+	flag.BoolVarP(&useEditor, "edit", "e", false, "Edit text in editor")
 	flag.BoolVarP(&sendToInbox, "inbox", "i", false, "Add to Inbox")
 	flag.BoolVarP(&sendToJournal, "journal", "j", false, "Add to Journal")
 	flag.BoolVarP(&shouldPaste, "paste", "p", false, "Paste the contents of the clipboard.")
@@ -96,4 +98,9 @@ func GetPassword() string {
 // IsPasswordSet checks whether the password flag has anything
 func IsPasswordSet() bool {
 	return len(GetPassword()) > 0
+}
+
+// ShouldUseEditor returns bool for whether the -e flag is set
+func ShouldUseEditor() bool {
+	return useEditor
 }
