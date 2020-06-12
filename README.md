@@ -87,6 +87,8 @@ See [Block Customization](#block-customization) for how to customize the blocks.
 
 # Config File
 
+The configuration file is named `config.json`.
+
 ## Location of Config File
 
 ### Linux
@@ -121,7 +123,11 @@ You can customize the blocks by configuring the `begin` and `end` string for a b
 
 Add `\n` to add a newline.
 
-The `none` setting is the default that is used when no [block option](#block-options) are provided.
+The `default` setting is the block that is used when no [block option](#block-options) are provided.
+
+## Custom Text Editor
+
+The config file includes an option to setup a custom text editor when you use the `-e` flag. The default is set to the `$EDITOR` environment variable. You can customize the editor and the arguments that the editor will receive.
 
 # Authentication
 
@@ -152,10 +158,6 @@ Paste and add to the Journal.
 ```bash
 $ tikli -pf
 ```
-
-# Blocks
-
-The blocks can be configured by editing your configuration file
 
 # Tiddler Titles
 
