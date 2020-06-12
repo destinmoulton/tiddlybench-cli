@@ -32,9 +32,13 @@ const (
 	// CKEnd config key
 	CKEnd = "end"
 	// CKTextEditor config key for the "editor" settings
-	CKTextEditor = "editor"
-	// CKTextEditorDefault config key for the default editor
+	CKTextEditorKey = "editor"
+	// CKTextEditorDefaultKey
+	CKTextEditorDefaultKey = "default"
+	// CKTextEditorDefault config value for the default editor
 	CKTextEditorDefault = "$EDITOR"
-	// CKTextEditorArgs config key for the editor arguments
+	// CKTextEditorArgsKey config key for the editor arguments
+	CKTextEditorArgsKey = "key"
+	// CKTextEditorArgs default config value for the editor arguments
 	CKTextEditorArgs = ""
 )

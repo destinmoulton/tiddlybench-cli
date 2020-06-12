@@ -87,9 +87,9 @@ func (c *Config) initializeDefaults() {
 	}
 
 	// Text Editor Defaults
-	c.viper.SetDefault(CKTextEditor, nil)
-	c.viper.SetDefault(CKTextEditor + "." + CKTextEditorDefault)
-	c.viper.SetDefault(CKTextEditor + "." + CKTextEditorArgs)
+	c.viper.SetDefault(CKTextEditorKey, nil)
+	c.viper.SetDefault(CKTextEditorKey+"."+CKTextEditorDefaultKey, CKTextEditorDefault)
+	c.viper.SetDefault(CKTextEditorKey+"."+CKTextEditorArgsKey, CKTextEditorArgs)
 }
 
 func (c *Config) setup() {
