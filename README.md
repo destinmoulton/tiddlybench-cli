@@ -50,20 +50,40 @@ $ tikli -i --code -a "function falsify(){\nreturn false;\n}"
 
 # CLI Options
 
-## Commands
+## Command Line Flags and Options
 
 | Flag | Command   | Description                                         |
 | ---- | --------- | --------------------------------------------------- |
 | -a   | --add     | Add or append text to the tiddler                   |
 | -c   | --config  | Re-run the configuration questions                  |
-| -p   | --paste   | Paste form the [Clipboard](#clipboard-usage)        |
+| -e   | --edit    | Edit the new content with your favorite text editor |
 | -i   | --inbox   | Add to the Inbox                                    |
 | -j   | --journal | Add to the Journal                                  |
+| -p   | --paste   | Paste form the [Clipboard](#clipboard-usage)        |
 | -t   | --title   | Set the title of the tiddler you want to add/append |
 
-## Blocks
+Note: -t will override -i (inbox) or -j (journal)
 
-You can set how you want
+## Block Options
+
+You can set the block that will surround the content that you add.
+
+| Command  | Description                 |
+| -------- | --------------------------- |
+| --code   | Monospaced code block       |
+| --bullet | Bulleted list item          |
+| --number | Numbered list item          |
+| --quote  | Quote block                 |
+| --h1     | H1 aka first level header   |
+| --h2     | H2 aka second level header  |
+| --h3     | H3 aka third level header   |
+| --h4     | H4 aka fourth level header  |
+| --h5     | H5 aka fifth level header   |
+| --custom | Custom user definable block |
+
+If you are editing the text using an external editor, using the `-e` flag, the block code will be visible and editable within the text editor.
+
+See [Block Customization](#block-customization) for how to customize the blocks.
 
 # Config File
 
@@ -95,11 +115,13 @@ $HOME/Library/Application Support/tikli/config.json
 %AppData%/tikli/config.json
 ```
 
-## Block Configuration
+## Block Customization
 
 You can customize the blocks by configuring the `begin` and `end` string for a block.
 
 Add `\n` to add a newline.
+
+The `none` setting is the default that is used when no [block option](#block-options) are provided.
 
 # Authentication
 
@@ -107,9 +129,9 @@ tikli assumes that your TiddlyWiki installation is configured with basic authent
 
 ## Password Storage
 
-tikli will ask if you want to save your password.
+During the configuration stage tikli will ask if you want to save your password.
 
-This may not be safe if you are using an account where the administrator is not you.
+Saving your password may not be safe if you are using an account where the administrator is not you.
 
 # Clipboard Usage
 
