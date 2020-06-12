@@ -20,8 +20,8 @@ var (
 	api    *apicall.APICall
 )
 
-// Dispatch the right activity for the app
-func Dispatch(log logger.Logger) {
+// Run the right activity for the app
+func Run(log logger.Logger) {
 
 	cfg = config.New(log)
 	pipe = piper.New(log)

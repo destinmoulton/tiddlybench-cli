@@ -8,5 +8,5 @@ import (
 func main() {
 	log := logger.GetInstance()
 
-	dispatch.Dispatch(log)
+	dispatch.Run(log)
 }
