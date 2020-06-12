@@ -85,6 +85,11 @@ func (c *Config) initializeDefaults() {
 		c.viper.SetDefault(CKBlocks+"."+key+"."+CKBegin, parts.Begin)
 		c.viper.SetDefault(CKBlocks+"."+key+"."+CKEnd, parts.End)
 	}
+
+	// Text Editor Defaults
+	c.viper.SetDefault(CKTextEditor, nil)
+	c.viper.SetDefault(CKTextEditor + "." + CKTextEditorDefault)
+	c.viper.SetDefault(CKTextEditor + "." + CKTextEditorArgs)
 }
 
 func (c *Config) setup() {
