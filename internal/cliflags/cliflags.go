@@ -14,7 +14,7 @@ var (
 	sendToJournal        = false
 	useEditor            = false
 	tiddlerTitle         = ""
-	defaultSelectedBlock = "bullet"
+	defaultSelectedBlock = "default"
 	password             = ""
 	addText              = ""
 )

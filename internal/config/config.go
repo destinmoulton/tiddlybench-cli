@@ -36,16 +36,17 @@ type blockParts struct {
 
 // Blocks define a slice of blocks for tiddlers
 var Blocks = map[string]blockParts{
-	"code":   {Begin: "\n\n```\n", End: "\n```\n\n"},
-	"bullet": {Begin: "\n* ", End: "\n"},
-	"number": {Begin: "\n# ", End: "\n"},
-	"quote":  {Begin: "\n\n<<<\n", End: "\n<<<\n\n"},
-	"h1":     {Begin: "! ", End: "\n"},
-	"h2":     {Begin: "!! ", End: "\n"},
-	"h3":     {Begin: "!!! ", End: "\n"},
-	"h4":     {Begin: "!!!! ", End: "\n"},
-	"h5":     {Begin: "!!!!! ", End: "\n"},
-	"custom": {Begin: "\n\n", End: "\n\n"},
+	"default": {Begin: "\n", End: "\n"},
+	"code":    {Begin: "\n\n```\n", End: "\n```\n\n"},
+	"bullet":  {Begin: "\n* ", End: "\n"},
+	"number":  {Begin: "\n# ", End: "\n"},
+	"quote":   {Begin: "\n\n<<<\n", End: "\n<<<\n\n"},
+	"h1":      {Begin: "! ", End: "\n"},
+	"h2":      {Begin: "!! ", End: "\n"},
+	"h3":      {Begin: "!!! ", End: "\n"},
+	"h4":      {Begin: "!!!! ", End: "\n"},
+	"h5":      {Begin: "!!!!! ", End: "\n"},
+	"custom":  {Begin: "\n\n", End: "\n\n"},
 }
 
 // Config is a struct for the configuration interface
