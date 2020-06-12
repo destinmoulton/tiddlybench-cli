@@ -1,4 +1,4 @@
-module tiddly-cli
+module tikli
 
 go 1.14
 

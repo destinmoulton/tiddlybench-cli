@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"io"
 	"os"
-	"tiddly-cli/internal/logger"
+	"tikli/internal/logger"
 )
 
 var (

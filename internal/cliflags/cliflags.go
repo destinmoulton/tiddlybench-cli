@@ -3,7 +3,7 @@ package cliflags
 import (
 	"fmt"
 	flag "github.com/spf13/pflag"
-	"tiddly-cli/internal/config"
+	"tikli/internal/config"
 )
 
 var (

@@ -4,10 +4,10 @@ import (
 	"github.com/spf13/viper"
 	"os"
 	"path"
-	"tiddly-cli/internal/logger"
+	"tikli/internal/logger"
 )
 
-var configSubdir = "tiddly-cli"
+var configSubdir = "tikli"
 var configName = "config"
 var configType = "json"
 var configExt = "json"
