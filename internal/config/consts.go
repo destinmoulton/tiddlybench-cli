@@ -38,7 +38,7 @@ const (
 	// CKTextEditorDefault config value for the default editor
 	CKTextEditorDefault = "$EDITOR"
 	// CKTextEditorArgsKey config key for the editor arguments
-	CKTextEditorArgsKey = "key"
+	CKTextEditorArgsKey = "args"
 	// CKTextEditorArgs default config value for the editor arguments
 	CKTextEditorArgs = ""
 )
