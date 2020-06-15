@@ -67,14 +67,15 @@ func Run(log logger.Logger) {
 		}
 
 		if cliflags.ShouldUseEditor() {
-			prefEd := editor.GetPreferredEditorFromEnvironment
-			textBytes, eerr := editor.CaptureInputFromEditor(tidtext, prefEd)
+			editorSetting := cfg.Get(config.CKTextEditorKey + "." + config.CKTextEditorDefaultKey)
+			argsSetting := cfg.Get(config.CKTextEditorKey + "." + config.CKTextEditorArgsKey)
+			textFromEditor, eerr := editor.Edit(tidtext, editorSetting, argsSetting)
 			if eerr != nil {
 				fmt.Println("Unable to use the editor.")
 				fmt.Println(eerr)
 				os.Exit(1)
 			}
-			tidtext = string(textBytes)
+			tidtext = textFromEditor
 		}
 
 		// Wrap the text in the selected block

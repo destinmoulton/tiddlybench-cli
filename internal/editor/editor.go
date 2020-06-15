@@ -1,52 +1,57 @@
 package editor
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"strings"
 )
 
-// DefaultEditor is vim because we're adults ;)
-const DefaultEditor = "vim"
+// Edit opens the desired text in the desired editor with the arguments
+func Edit(text string, editorSetting string, args string) (string, error) {
 
-// PreferredEditorResolver is a function that returns an editor that the user
-// prefers to use, such as the configured `$EDITOR` environment variable.
-type PreferredEditorResolver func() string
+	editor := getPreferredEditor(editorSetting)
 
-// GetPreferredEditorFromEnvironment returns the user's editor as defined by the
-// `$EDITOR` environment variable, or the `DefaultEditor` if it is not set.
-func GetPreferredEditorFromEnvironment() string {
-	editor := os.Getenv("EDITOR")
+	textBytes, err := captureInputFromEditor(text, editor, args)
+	if err != nil {
+		return "", err
+	}
+	return string(textBytes), nil
+}
 
-	if editor == "" {
-		return DefaultEditor
+// getPreferredEditor returns the user's editor as defined by the
+// `$EDITOR` environment variable, or the editorSetting
+func getPreferredEditor(editorSetting string) string {
+	editor := editorSetting
+	if editorSetting == "$EDITOR" {
+		// Get it from the $EDITOR env setting
+		editor = os.Getenv("EDITOR")
 	}
 
 	return editor
 }
 
-func resolveEditorArguments(executable string, filename string) []string {
-	args := []string{filename}
-
-	if strings.Contains(executable, "Visual Studio Code.app") {
-		args = append([]string{"--wait"}, args...)
+// buildEditorArguments builds the command string
+func buildEditorArguments(args string, filename string) string {
+	if args != "" {
+		return strings.TrimSpace(args) + " " + filename
 	}
-
-	// Other common editors
-
-	return args
+	return filename
 }
 
-// OpenFileInEditor opens filename in a text editor.
-func OpenFileInEditor(filename string, resolveEditor PreferredEditorResolver) error {
+// openFileInEditor opens filename in a text editor.
+func openFileInEditor(filename string, editor string, args string) error {
 	// Get the full executable path for the editor.
-	executable, err := exec.LookPath(resolveEditor())
+	executable, err := exec.LookPath(editor)
 	if err != nil {
 		return err
 	}
 
-	cmd := exec.Command(executable, resolveEditorArguments(executable, filename)...)
+	editorArguments := buildEditorArguments(args, filename)
+
+	fmt.Println("openFileInEditor editor " + editorArguments)
+	cmd := exec.Command(executable, editorArguments)
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
@@ -54,10 +59,10 @@ func OpenFileInEditor(filename string, resolveEditor PreferredEditorResolver) er
 	return cmd.Run()
 }
 
-// CaptureInputFromEditor opens a temporary file in a text editor and returns
+// captureInputFromEditor opens a temporary file in a text editor and returns
 // the written bytes on success or an error on failure. It handles deletion
 // of the temporary file behind the scenes.
-func CaptureInputFromEditor(text string, resolveEditor PreferredEditorResolver) ([]byte, error) {
+func captureInputFromEditor(text string, editor string, args string) ([]byte, error) {
 	file, err := ioutil.TempFile(os.TempDir(), "*")
 	if err != nil {
 		return []byte{}, err
@@ -76,7 +81,7 @@ func CaptureInputFromEditor(text string, resolveEditor PreferredEditorResolver) 
 		return []byte{}, err
 	}
 
-	if err = OpenFileInEditor(filename, resolveEditor); err != nil {
+	if err = openFileInEditor(filename, editor, args); err != nil {
 		return []byte{}, err
 	}
 
