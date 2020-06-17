@@ -44,6 +44,7 @@ func (p *Prompt) PromptForConfig() {
 	// destination prompts
 	inboxTitle, inboxTags := p.promptDestination(config.CKInbox)
 	journalTitle, journalTags := p.promptDestination(config.CKJournal)
+	defaultDestination := p.promptDefaultDestination()
 
 	// Set the c values
 	if url != "" && username != "" {
@@ -51,10 +52,11 @@ func (p *Prompt) PromptForConfig() {
 		p.config.Set(config.CKUsername, username)
 		p.config.Set(config.CKShouldSavePassword, savePassword)
 		p.config.Set(config.CKPassword, password)
-		p.config.SetNested(config.CKDestinations, config.CKInbox, config.CKTitleTemplate, inboxTitle)
-		p.config.SetNested(config.CKDestinations, config.CKInbox, config.CKTags, inboxTags)
-		p.config.SetNested(config.CKDestinations, config.CKJournal, config.CKTitleTemplate, journalTitle)
-		p.config.SetNested(config.CKDestinations, config.CKJournal, config.CKTags, journalTags)
+		p.config.SetNested([]string{config.CKDestinations, config.CKInbox, config.CKTitleTemplate}, inboxTitle)
+		p.config.SetNested([]string{config.CKDestinations, config.CKInbox, config.CKTags}, inboxTags)
+		p.config.SetNested([]string{config.CKDestinations, config.CKJournal, config.CKTitleTemplate}, journalTitle)
+		p.config.SetNested([]string{config.CKDestinations, config.CKJournal, config.CKTags}, journalTags)
+		p.config.Set(config.CKDestinations+"."+config.CKDefaultDestination, defaultDestination)
 		p.config.Save()
 	}
 }
@@ -99,6 +101,22 @@ func (p *Prompt) promptUsername() string {
 	}
 
 	return username
+}
+
+func (p *Prompt) promptDefaultDestination() string {
+
+	prompt := promptui.Select{
+		Label: "Select default destination",
+		Items: []string{"Inbox", "Journal"},
+	}
+
+	_, result, err := prompt.Run()
+
+	if err != nil {
+		p.log.Fatal("Prompt Error. Unable to get the default destination")
+	}
+
+	return strings.ToLower(result)
 }
 
 func (p *Prompt) promptDestination(dest string) (string, string) {

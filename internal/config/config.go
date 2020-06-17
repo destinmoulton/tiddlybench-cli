@@ -4,6 +4,7 @@ import (
 	"github.com/spf13/viper"
 	"os"
 	"path"
+	"strings"
 	"tikli/internal/logger"
 )
 
@@ -78,6 +79,8 @@ func (c *Config) initializeDefaults() {
 		c.viper.SetDefault(CKDestinations+"."+key+"."+CKTags, def.Tags)
 		c.viper.SetDefault(CKDestinations+"."+key+"."+CKTitleTemplate, def.TitleTemplate)
 	}
+	// Set inbox as the default destination
+	c.viper.SetDefault(CKDestinations+"."+CKDefaultDestination, CKInbox)
 
 	// Block defaults
 	c.viper.SetDefault(CKBlocks, nil)
@@ -127,8 +130,8 @@ func (c *Config) Get(key string) string {
 }
 
 // GetNested returns a nested config value string
-func (c *Config) GetNested(one string, two string, three string) string {
-	return c.viper.GetString(one + "." + two + "." + three)
+func (c *Config) GetNested(parts ...string) string {
+	return c.viper.GetString(strings.Join(parts, "."))
 }
 
 // Set assigns a config value to a key
@@ -137,8 +140,8 @@ func (c *Config) Set(key string, value string) {
 }
 
 // SetNested sets a nested config value
-func (c *Config) SetNested(one string, two string, three string, value string) {
-	c.viper.Set(one+"."+two+"."+three, value)
+func (c *Config) SetNested(parts []string, value string) {
+	c.viper.Set(strings.Join(parts, "."), value)
 }
 
 // Save the config to the file

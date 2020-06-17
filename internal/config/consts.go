@@ -11,6 +11,8 @@ const (
 	CKInbox = "inbox"
 	// CKJournal is the title of the journal config entry
 	CKJournal = "journal"
+	// CKDefaultDestination
+	CKDefaultDestination = "default_destination"
 	// CKTags config key
 	CKTags = "tags"
 	// CKTitleTemplate config key
