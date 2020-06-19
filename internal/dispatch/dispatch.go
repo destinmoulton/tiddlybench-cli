@@ -156,6 +156,11 @@ func getTiddlerTitleFromFlags() string {
 	}
 
 	sendTo := cliflags.GetSendTo()
+	if sendTo == "" {
+		// No destination flag is set so use the config default
+		sendTo = cfg.GetNested(config.CKDestinations, config.CKDefaultDestination)
+	}
+
 	if sendTo != "" {
 		return cfg.GetNested(config.CKDestinations, sendTo, config.CKTitleTemplate)
 	}
