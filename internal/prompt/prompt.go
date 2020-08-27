@@ -126,7 +126,7 @@ func (p *Prompt) promptDestination(dest string) (string, string) {
 	currentTags := p.config.GetNested(config.CKDestinations, dest, config.CKTags)
 
 	titleprompt := promptui.Prompt{
-		Label:   destTitle + " Title Template",
+		Label:   destTitle + " Tiddler Title",
 		Default: currentTitle,
 	}
 	title, terr := titleprompt.Run()
