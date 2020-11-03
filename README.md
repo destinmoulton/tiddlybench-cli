@@ -1,13 +1,33 @@
+# What is TiddlyBench CLI?
+
+TiddlyBench CLI is a command line interface for TiddlyWiki.
+
+TiddlyBench CLI is a companion to the (TiddlyBench browser extension)[https://github.com/destinmoulton/tiddlybench-extension] for Firefox and Chrome. Check out the [TiddlyBench website](https://tiddlybench.com) for more documentation on TiddlyBench CLI and the TiddlyBench browser extension.
+
+# Features
+
+-   Paste directly into a TiddlyWiki tiddler
+-   Quickly add entries to your Journal or Inbox
+-   Edit a tiddler using your favorite text editor
+-   Pipe a file directly into a tiddler
+
+# Warning
+
+TiddlyBench is in early development so use it at your own risk.
+Make frequent backups!
+
 # Usage
 
-If a Tiddler does not exist with that title, a new Tiddler will be created with that title.
+## Tiddler Notes
+
+If a Tiddler does not exist with a given title, a new tiddler will be created with that title.
 
 ## Basic
 
 Set the title (`-t`) and add (`-a`) text to that tiddler.
 
 ```bash
-$ tikli -t "Title of Tiddler" -a "Text that will be added to the tiddler"
+$ tb -t "Title of Tiddler" -a "Text that will be added to the tiddler"
 ```
 
 ## Journal and Inbox
@@ -15,7 +35,7 @@ $ tikli -t "Title of Tiddler" -a "Text that will be added to the tiddler"
 Add (`-a`) a new journal (`-j`) entry:
 
 ```bash
-$ tikli -j -a "This text will be added to the journal"
+$ tb -j -a "This text will be added to the journal"
 ```
 
 ## Pasting
@@ -23,13 +43,13 @@ $ tikli -j -a "This text will be added to the journal"
 Paste (`-p`) the contents of your clipboard to your tiddler Inbox (`-i`):
 
 ```bash
-$ tikli -p -i
+$ tb -p -i
 ```
 
 Paste a quote (`--quote`) from the clipboard into today's journal (`-j`):
 
 ```bash
-$ tikli -p -j --quote
+$ tb -p -j --quote
 ```
 
 ## Piping
@@ -37,7 +57,7 @@ $ tikli -p -j --quote
 Pipe data into a tiddler (`-t`):
 
 ```bash
-$ cat underground.txt | tikli -t "Notes from the Underground"
+$ cat underground.txt | tb -t "Notes from the Underground"
 ```
 
 ## Blocks
@@ -45,7 +65,7 @@ $ cat underground.txt | tikli -t "Notes from the Underground"
 Add (`-a`) a code block (`--code`) to the Inbox (`-i`):
 
 ```bash
-$ tikli -i --code -a "function falsify(){\nreturn false;\n}"
+$ tb -i --code -a "function falsify(){\nreturn false;\n}"
 ```
 
 # CLI Options
