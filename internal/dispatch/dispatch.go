@@ -37,7 +37,8 @@ func Run(log logger.Logger) {
 
 	if cliflags.ShouldPromptForConfig() || !cfg.IsConfigFileSet() {
 		// Prompt to configure the username/password
-		prompt.PromptForConfig()
+		//prompt.PromptForConfig()
+		prompt.PromptForSavePassword()
 		os.Exit(0)
 	}
 

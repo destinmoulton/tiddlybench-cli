@@ -26,7 +26,7 @@ func New(log logger.Logger, config *config.Config) *Prompt {
 }
 
 // PromptForConfig asks the user a series of config questions
-func (p *Prompt) PromptForConfig() {
+func (p *Prompt) PromptForConfigOld() {
 	url := p.promptURL()
 
 	if !util.TestURL(url) {
