@@ -2,7 +2,7 @@
 
 TiddlyBench CLI is a command line interface for TiddlyWiki.
 
-TiddlyBench CLI is a companion to the (TiddlyBench browser extension)[https://github.com/destinmoulton/tiddlybench-extension] for Firefox and Chrome. Check out the [TiddlyBench website](https://tiddlybench.com) for more documentation on TiddlyBench CLI and the TiddlyBench browser extension.
+TiddlyBench CLI is a companion to the [TiddlyBench browser extension](https://github.com/destinmoulton/tiddlybench-extension) for Firefox and Chrome. Check out the [TiddlyBench website](https://tiddlybench.com) for more documentation on TiddlyBench CLI and the TiddlyBench browser extension.
 
 # Features
 
