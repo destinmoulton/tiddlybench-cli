@@ -3,14 +3,14 @@ package dispatch
 import (
 	"fmt"
 	"os"
-	"tikli/internal/apicall"
-	"tikli/internal/cliflags"
-	"tikli/internal/clipboard"
-	"tikli/internal/config"
-	"tikli/internal/editor"
-	"tikli/internal/logger"
-	"tikli/internal/piper"
-	prompter "tikli/internal/prompt"
+	"tiddlybench-cli/internal/apicall"
+	"tiddlybench-cli/internal/cliflags"
+	"tiddlybench-cli/internal/clipboard"
+	"tiddlybench-cli/internal/config"
+	"tiddlybench-cli/internal/editor"
+	"tiddlybench-cli/internal/logger"
+	"tiddlybench-cli/internal/piper"
+	prompter "tiddlybench-cli/internal/prompt"
 )
 
 var (

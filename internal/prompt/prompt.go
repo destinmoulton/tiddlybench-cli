@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"github.com/manifoldco/promptui"
 	"strings"
-	"tikli/internal/config"
-	"tikli/internal/logger"
-	"tikli/internal/util"
+	"tiddlybench-cli/internal/config"
+	"tiddlybench-cli/internal/logger"
+	"tiddlybench-cli/internal/util"
 	"time"
 )
 

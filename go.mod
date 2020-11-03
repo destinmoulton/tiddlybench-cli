@@ -1,4 +1,4 @@
-module tikli
+module tiddlybench-cli
 
 go 1.14
 

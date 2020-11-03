@@ -5,7 +5,7 @@ import (
 	"os"
 	"path"
 	"strings"
-	"tikli/internal/logger"
+	"tiddlybench-cli/internal/logger"
 )
 
 var configSubdir = "tikli"

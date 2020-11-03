@@ -1,8 +1,8 @@
 package main
 
 import (
-	"tikli/internal/dispatch"
-	logger "tikli/internal/logger"
+	"tiddlybench-cli/internal/dispatch"
+	logger "tiddlybench-cli/internal/logger"
 )
 
 func main() {

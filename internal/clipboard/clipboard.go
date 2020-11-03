@@ -2,7 +2,7 @@ package clipboard
 
 import (
 	"github.com/atotto/clipboard"
-	"tikli/internal/logger"
+	"tiddlybench-cli/internal/logger"
 )
 
 // Paste gets the contents of the clipboard

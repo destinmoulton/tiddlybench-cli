@@ -116,25 +116,25 @@ The configuration file is named `config.json`.
 If `$XDG_CONFIG_HOME` is defined:
 
 ```
-$XDG_CONFIG_HOME/tikli/config.json
+$XDG_CONFIG_HOME/tiddlybench-cli/config.json
 ```
 
 Otherwise it will default to:
 
 ```
-$HOME/.config/tikli/config.json
+$HOME/.config/tiddlybench-cli/config.json
 ```
 
 ### MacOS
 
 ```
-$HOME/Library/Application Support/tikli/config.json
+$HOME/Library/Application Support/tiddlybench-cli/config.json
 ```
 
 ### Windows
 
 ```
-%AppData%/tikli/config.json
+%AppData%/tiddlybench-cli/config.json
 ```
 
 ## Block Customization

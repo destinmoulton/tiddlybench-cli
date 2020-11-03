@@ -6,8 +6,8 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
-	"tikli/internal/config"
-	"tikli/internal/logger"
+	"tiddlybench-cli/internal/config"
+	"tiddlybench-cli/internal/logger"
 )
 
 // APICall struct
