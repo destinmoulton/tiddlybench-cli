@@ -8,7 +8,7 @@ import (
 	"tiddlybench-cli/internal/logger"
 )
 
-var configSubdir = "tikli"
+var configSubdir = "tiddlybench-cli"
 var configName = "config"
 var configType = "json"
 var configExt = "json"

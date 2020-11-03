@@ -151,17 +151,17 @@ The config file includes an option to setup a custom text editor when you use th
 
 # Authentication
 
-tikli assumes that your TiddlyWiki installation is configured with basic authentication.
+TiddlyBench assumes that your TiddlyWiki installation is configured with basic authentication.
 
 ## Password Storage
 
-During the configuration stage tikli will ask if you want to save your password.
+During the configuration stage TiddlyBench will ask if you want to save your password.
 
 Saving your password may not be safe if you are using an account where the administrator is not you.
 
 # Clipboard Usage
 
-tikli can paste text directly to a tiddler.
+TiddlyBench can paste text directly to a tiddler.
 
 Note: `xsel` or `xclip` are required for Linux usage
 
@@ -170,13 +170,13 @@ Note: `xsel` or `xclip` are required for Linux usage
 Paste and ask for Tiddler title.
 
 ```bash
-$ tikli -p
+$ tb -p
 ```
 
 Paste and add to the Journal.
 
 ```bash
-$ tikli -pf
+$ tb -pf
 ```
 
 # Tiddler Titles
@@ -184,10 +184,10 @@ $ tikli -pf
 You can add a custom Tiddler title using the -t flag.
 
 ```
-$ tikli -t "New Tiddler"
+$ tb -t "New Tiddler"
 ```
 
-`tikli` is configured with two main tiddlers:
+TiddlyBench CLI is configured with two main tiddlers:
 
 -   Inbox (`-i`)
 -   Journal (`-j`)
@@ -202,7 +202,7 @@ You can configure the tiddlers (either Inbox or Journal) to use date and time st
 
 ### List of Substitutions
 
-The substitutions in the title are performed locally by `tikli`, not by TiddlyWiki. Therefore, not all of them have been implemented because I only have so many hours in a day.
+The substitutions in the title are performed locally by TiddlyBench, not by TiddlyWiki. Therefore, not all of them have been implemented because I only have so many hours in a day.
 
 | Token        | Substituted Value                          |
 | ------------ | ------------------------------------------ |
@@ -240,4 +240,4 @@ The substitutions in the title are performed locally by `tikli`, not by TiddlyWi
 See Also: [TiddlyWiki DateFormat Reference](https://tiddlywiki.com/static/DateFormat.html)
 
 This can be configured directly when you initially run|
-`tikli` or using the `-c` configuration flag, or by manually setting the title in the [config file](#config-file).
+TiddlyBench or using the `-c` configuration flag, or by manually setting the title in the [config file](#config-file).

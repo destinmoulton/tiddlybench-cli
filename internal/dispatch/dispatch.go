@@ -130,7 +130,7 @@ func verifyPasswordAndConnection() {
 		fmt.Println("Connection Error. The url, username, or password is incorrect")
 		fmt.Println("Configured URL: " + url)
 		fmt.Println("Configured Username: " + username)
-		fmt.Println("Run 'tikli -c' to reconfigure or try a different password.")
+		fmt.Println("Run 'tb -c' to reconfigure or try a different password.")
 		os.Exit(1)
 	}
 }
@@ -171,7 +171,7 @@ func requireConfigFile() {
 
 	if !cfg.IsConfigFileSet() {
 		fmt.Println("Config file has not been set.")
-		fmt.Println("Run tikli with -c option to configure")
+		fmt.Println("Run with -c option to configure")
 		os.Exit(1)
 	}
 }
@@ -179,7 +179,7 @@ func requireConfigFile() {
 func requirePasswordFlag() {
 	if !cfg.IsPasswordSaved() && !cliflags.IsPasswordSet() {
 		fmt.Println("Password is required, but it is not saved in the config file.")
-		fmt.Println("Add the password to the command line arguments: tikli --password 'YourPass'")
+		fmt.Println("Add the password to the command line arguments: tb --password 'YourPass'")
 		os.Exit(1)
 	}
 }
