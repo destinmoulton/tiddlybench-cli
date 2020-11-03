@@ -18,11 +18,11 @@ Make frequent backups!
 
 # Usage
 
-## Tiddler Notes
+## Be Aware
 
 If a Tiddler does not exist with a given title, a new tiddler will be created with that title.
 
-## Basic
+## Basic Usage
 
 Set the title (`-t`) and add (`-a`) text to that tiddler.
 
