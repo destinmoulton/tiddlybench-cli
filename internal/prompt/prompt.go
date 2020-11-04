@@ -60,48 +60,6 @@ func (p *Prompt) PromptConfigDispatch() {
 	*/
 }
 
-func (p *Prompt) promptURL() string {
-
-	dflt := p.config.Get(config.CKURL)
-	validate := func(input string) error {
-
-		if !util.IsURL(input) {
-			return errors.New("The URL is not valid. Should start with http:// or https://")
-		}
-
-		return nil
-	}
-	prompt := promptui.Prompt{
-		Label:    "TiddlyWiki URL",
-		Validate: validate,
-		Default:  dflt,
-	}
-	url, err := prompt.Run()
-
-	if err != nil {
-		p.log.Fatal("Prompt Error. Unable to get the URL")
-	}
-
-	return url
-
-}
-
-func (p *Prompt) promptUsername() string {
-
-	dflt := p.config.Get(config.CKUsername)
-	prompt := promptui.Prompt{
-		Label:   "Username",
-		Default: dflt,
-	}
-	username, err := prompt.Run()
-
-	if err != nil {
-		p.log.Fatal("Prompt Error. Unable to get the Username")
-	}
-
-	return username
-}
-
 func (p *Prompt) promptDefaultDestination() string {
 
 	prompt := promptui.Select{
