@@ -13,37 +13,46 @@ import (
 
 // PromptForSavePassword asks the user if they want to save their password
 func (p *Prompt) PromptForSavePassword() {
-	if err := tea.NewProgram(p.initialModel()).Start(); err != nil {
+	model := p.initialModel()
+	if err := tea.NewProgram(&model).Start(); err != nil {
 		fmt.Printf("Could not start Save Password prompt: %s\n", err)
 		os.Exit(1)
+	} else {
+
+		fmt.Println(model.getSelected())
 	}
+
 }
 
 type spmodel struct {
-	choices  []string         // items on the to-do list
-	cursor   int              // which to-do list item our cursor is pointing at
-	selected map[int]struct{} // which to-do items are selected
+	choices  []string // items on the to-do list
+	cursor   int      // which to-do list item our cursor is pointing at
+	selected int      // which to-do items are selected
+}
+
+func (m *spmodel) getSelected() int {
+	return m.selected
 }
 
 func (p *Prompt) initialModel() spmodel {
 	shouldSave := p.config.Get(config.CKShouldSavePassword)
 	cursor := 0
-	if shouldSave == "no" {
-		cursor = 1
+	selected := 0
+	if shouldSave == config.CKNo {
+		selected = 1
 	}
 
-	choices := []string{"Yes", "No"}
-	selected := make(map[int]struct{})
+	choices := []string{"No", "Yes"}
 
 	return spmodel{choices, cursor, selected}
 
 }
-func (m spmodel) Init() tea.Cmd {
+func (m *spmodel) Init() tea.Cmd {
 	// no I/O
 	return nil
 }
 
-func (m spmodel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m *spmodel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 
 	// Is it a key press?
@@ -71,12 +80,7 @@ func (m spmodel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		// The "enter" key and the spacebar (a literal space) toggle
 		// the selected state for the item that the cursor is pointing at.
 		case "enter", " ":
-			_, ok := m.selected[m.cursor]
-			if ok {
-				delete(m.selected, m.cursor)
-			} else {
-				m.selected[m.cursor] = struct{}{}
-			}
+			m.selected = m.cursor
 		}
 	}
 	// Return the updated model to the Bubble Tea runtime for processing.
@@ -84,10 +88,10 @@ func (m spmodel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-func (m spmodel) View() string {
+func (m *spmodel) View() string {
 	// The header
 	s := "Do you want to save the password?\n\n"
-	s = s + "You may not want to save the password if you are not the administrator or are in a multi user environment.\n\n"
+	s = s + "You may not want to save the password\nif you are not the administrator or are in a multi user environment.\n\n"
 
 	// Iterate over our choices
 	for i, choice := range m.choices {
@@ -100,7 +104,7 @@ func (m spmodel) View() string {
 
 		// Is this choice selected?
 		checked := " " // not selected
-		if _, ok := m.selected[i]; ok {
+		if i == m.selected {
 			checked = "x" // selected!
 		}
 
