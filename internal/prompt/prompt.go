@@ -26,39 +26,38 @@ func New(log logger.Logger, config *config.Config) *Prompt {
 }
 
 // PromptForConfig asks the user a series of config questions
-func (p *Prompt) PromptForConfigOld() {
-	url := p.promptURL()
-
-	if !util.TestURL(url) {
-		fmt.Println("That URL is unreachable")
-	}
+func (p *Prompt) PromptConfigDispatch() {
 
 	// User auth prompts
-	username := p.promptUsername()
-	savePassword := p.promptToSavePassword()
-	password := ""
-	if savePassword == config.CKYes {
-		password = p.PromptForPassword()
-	}
+	connectionDetails := p.promptForConnection()
+	shouldSavePassword := p.PromptForSavePassword()
+	fmt.Println(connectionDetails)
+	fmt.Println(shouldSavePassword)
+	/*
+		password := ""
+		if savePassword == config.CKYes {
+			password = p.PromptForPassword()
+		}
 
-	// destination prompts
-	inboxTitle, inboxTags := p.promptDestination(config.CKInbox)
-	journalTitle, journalTags := p.promptDestination(config.CKJournal)
-	defaultDestination := p.promptDefaultDestination()
+		// destination prompts
+		inboxTitle, inboxTags := p.promptDestination(config.CKInbox)
+		journalTitle, journalTags := p.promptDestination(config.CKJournal)
+		defaultDestination := p.promptDefaultDestination()
 
-	// Set the c values
-	if url != "" && username != "" {
-		p.config.Set(config.CKURL, url)
-		p.config.Set(config.CKUsername, username)
-		p.config.Set(config.CKShouldSavePassword, savePassword)
-		p.config.Set(config.CKPassword, password)
-		p.config.SetNested([]string{config.CKDestinations, config.CKInbox, config.CKTitleTemplate}, inboxTitle)
-		p.config.SetNested([]string{config.CKDestinations, config.CKInbox, config.CKTags}, inboxTags)
-		p.config.SetNested([]string{config.CKDestinations, config.CKJournal, config.CKTitleTemplate}, journalTitle)
-		p.config.SetNested([]string{config.CKDestinations, config.CKJournal, config.CKTags}, journalTags)
-		p.config.Set(config.CKDestinations+"."+config.CKDefaultDestination, defaultDestination)
-		p.config.Save()
-	}
+		// Set the c values
+		if url != "" && username != "" {
+			p.config.Set(config.CKURL, url)
+			p.config.Set(config.CKUsername, username)
+			p.config.Set(config.CKShouldSavePassword, savePassword)
+			p.config.Set(config.CKPassword, password)
+			p.config.SetNested([]string{config.CKDestinations, config.CKInbox, config.CKTitleTemplate}, inboxTitle)
+			p.config.SetNested([]string{config.CKDestinations, config.CKInbox, config.CKTags}, inboxTags)
+			p.config.SetNested([]string{config.CKDestinations, config.CKJournal, config.CKTitleTemplate}, journalTitle)
+			p.config.SetNested([]string{config.CKDestinations, config.CKJournal, config.CKTags}, journalTags)
+			p.config.Set(config.CKDestinations+"."+config.CKDefaultDestination, defaultDestination)
+			p.config.Save()
+		}
+	*/
 }
 
 func (p *Prompt) promptURL() string {
@@ -146,29 +145,6 @@ func (p *Prompt) promptDestination(dest string) (string, string) {
 
 	return title, tags
 
-}
-
-func (p *Prompt) promptToSavePassword() string {
-	dflt := p.config.Get(config.CKShouldSavePassword)
-	prompt := promptui.Prompt{
-		Label:     "Save Password?",
-		IsConfirm: true,
-		Default:   dflt,
-	}
-
-	result, err := prompt.Run()
-
-	if result == "y" {
-		result = config.CKYes
-	} else {
-		result = config.CKNo
-	}
-
-	if err != nil {
-		p.log.Fatal("Prompt Error. Unable to get the Save Password option")
-	}
-
-	return result
 }
 
 // PromptForPassword uses promptui to get the basic auth password

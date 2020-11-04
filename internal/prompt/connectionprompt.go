@@ -4,41 +4,50 @@ package prompt
 // from the Bubbles component library.
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	te "github.com/muesli/termenv"
+
+	"tiddlybench-cli/internal/util"
 )
 
 const focusedTextColor = "205"
 
 var (
 	color               = te.ColorProfile().Color
+	red                 = color("196")
 	focusedPrompt       = te.String("> ").Foreground(color("205")).String()
 	promptPrefix        = "> "
 	focusedSubmitButton = "[ " + te.String("Submit").Foreground(color("205")).String() + " ]"
 	blurredSubmitButton = "[ " + te.String("Submit").Foreground(color("240")).String() + " ]"
 )
 
-// PromptForConfig presents the user with a config selection
-func (p *Prompt) PromptForConnection() {
-	if err := tea.NewProgram(initialModel()).Start(); err != nil {
-		fmt.Printf("could not start program: %s\n", err)
-		os.Exit(1)
-	}
-}
-
-type model struct {
+type connModel struct {
 	index         int
-	nameInput     textinput.Model
-	emailInput    textinput.Model
+	urlInput      textinput.Model
+	usernameInput textinput.Model
 	passwordInput textinput.Model
+	error         string
 	submitButton  string
 }
 
-func initialModel() model {
+// PromptForConnection presents the user with a config selection
+func (p *Prompt) promptForConnection() string {
+
+	model := buildInitialConnModel()
+	if err := tea.NewProgram(&model).Start(); err != nil {
+		fmt.Printf("could not start program: %s\n", err)
+		os.Exit(1)
+	}
+
+	return model.usernameInput.Value()
+}
+
+func buildInitialConnModel() connModel {
 	name := textinput.NewModel()
 	name.Placeholder = "https://address-to-your-tiddlywiki.com"
 	name.Focus()
@@ -58,14 +67,16 @@ func initialModel() model {
 	password.EchoCharacter = '•'
 	password.CharLimit = 128
 
-	return model{0, name, email, password, blurredSubmitButton}
+	error := ""
+
+	return connModel{0, name, email, password, error, blurredSubmitButton}
 
 }
-func (m model) Init() tea.Cmd {
+func (m *connModel) Init() tea.Cmd {
 	return textinput.Blink
 }
 
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m *connModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 
 	switch msg := msg.(type) {
@@ -79,8 +90,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "tab", "shift+tab", "enter", "up", "down":
 
 			inputs := []textinput.Model{
-				m.nameInput,
-				m.emailInput,
+				m.urlInput,
+				m.usernameInput,
 				m.passwordInput,
 			}
 
@@ -89,7 +100,14 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			// Did the user press enter while the submit button was focused?
 			// If so, exit.
 			if s == "enter" && m.index == len(inputs) {
-				return m, tea.Quit
+				if vuErr := m.validateURL(); vuErr != nil {
+					m.error = vuErr.Error()
+				} else if vsErr := m.validateUsername(); vsErr != nil {
+					m.error = vsErr.Error()
+				} else {
+
+					return m, tea.Quit
+				}
 			}
 
 			// Cycle indexes
@@ -119,9 +137,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				inputs[i].TextColor = ""
 			}
 
-			m.nameInput = inputs[0]
-			m.emailInput = inputs[1]
-			m.passwordInput = inputs[2]
+			m.urlInput = inputs[0]
+			m.usernameInput = inputs[1]
 
 			if m.index == len(inputs) {
 				m.submitButton = focusedSubmitButton
@@ -141,16 +158,17 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 // Pass messages and models through to text input components. Only text inputs
 // with Focus() set will respond, so it's safe to simply update all of them
 // here without any further logic.
-func updateInputs(msg tea.Msg, m model) (model, tea.Cmd) {
+func updateInputs(msg tea.Msg, m *connModel) (*connModel, tea.Cmd) {
+
 	var (
 		cmd  tea.Cmd
 		cmds []tea.Cmd
 	)
 
-	m.nameInput, cmd = m.nameInput.Update(msg)
+	m.urlInput, cmd = m.urlInput.Update(msg)
 	cmds = append(cmds, cmd)
 
-	m.emailInput, cmd = m.emailInput.Update(msg)
+	m.usernameInput, cmd = m.usernameInput.Update(msg)
 	cmds = append(cmds, cmd)
 
 	m.passwordInput, cmd = m.passwordInput.Update(msg)
@@ -159,12 +177,12 @@ func updateInputs(msg tea.Msg, m model) (model, tea.Cmd) {
 	return m, tea.Batch(cmds...)
 }
 
-func (m model) View() string {
+func (m *connModel) View() string {
 	s := "\n"
 
 	inputs := []string{
-		m.nameInput.View(),
-		m.emailInput.View(),
+		m.urlInput.View(),
+		m.usernameInput.View(),
 		m.passwordInput.View(),
 	}
 
@@ -175,6 +193,38 @@ func (m model) View() string {
 		}
 	}
 
+	if m.error != "" {
+		s += "\n\n" + te.String(m.error).Foreground(red).String()
+	}
+
 	s += "\n\n" + m.submitButton + "\n"
 	return s
+}
+
+func (m *connModel) validateURL() error {
+	url := m.urlInput.Value()
+
+	if url == "" {
+		return errors.New("You must include a URL for your TiddlyWiki server")
+	}
+
+	if !util.IsURL(url) {
+		return errors.New("The URL is invalid")
+	}
+
+	if !util.TestURL(url) {
+		return errors.New("The TiddlyWiki server is unreachable")
+	}
+
+	return nil
+}
+
+func (m *connModel) validateUsername() error {
+	url := m.usernameInput.Value()
+
+	if url == "" {
+		return errors.New("You must include the username for the TiddlyWiki server")
+	}
+
+	return nil
 }

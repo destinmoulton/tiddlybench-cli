@@ -9,20 +9,8 @@ import (
 	"tiddlybench-cli/internal/config"
 
 	tea "github.com/charmbracelet/bubbletea"
+	te "github.com/muesli/termenv"
 )
-
-// PromptForSavePassword asks the user if they want to save their password
-func (p *Prompt) PromptForSavePassword() {
-	model := p.initialModel()
-	if err := tea.NewProgram(&model).Start(); err != nil {
-		fmt.Printf("Could not start Save Password prompt: %s\n", err)
-		os.Exit(1)
-	} else {
-
-		fmt.Println(model.getSelected())
-	}
-
-}
 
 type spmodel struct {
 	choices  []string // items on the to-do list
@@ -30,8 +18,29 @@ type spmodel struct {
 	selected int      // which to-do items are selected
 }
 
-func (m *spmodel) getSelected() int {
-	return m.selected
+var (
+	spContinueButtonIndex   = 2
+	spContinueButtonBlurred = "[ " + te.String("Continue").Foreground(color("205")).String() + " ]"
+	spContinueButtonFocused = "[ " + te.String("Continue").Foreground(color("240")).String() + " ]"
+)
+
+// PromptForSavePassword asks the user if they want to save their password
+func (p *Prompt) PromptForSavePassword() string {
+	model := p.initialModel()
+	if err := tea.NewProgram(&model).Start(); err != nil {
+		fmt.Printf("Could not start Save Password prompt: %s\n", err)
+		os.Exit(1)
+	}
+
+	return model.getSelected()
+
+}
+
+func (m *spmodel) getSelected() string {
+	if m.selected == 0 {
+		return config.CKNo
+	}
+	return config.CKYes
 }
 
 func (p *Prompt) initialModel() spmodel {
@@ -73,14 +82,20 @@ func (m *spmodel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		// The "down" and "j" keys move the cursor down
 		case "down", "j":
-			if m.cursor < len(m.choices)-1 {
+			// Submit button adds one, so not `len(m.choices)-1`
+			if m.cursor < len(m.choices) {
 				m.cursor++
 			}
 
 		// The "enter" key and the spacebar (a literal space) toggle
 		// the selected state for the item that the cursor is pointing at.
 		case "enter", " ":
-			m.selected = m.cursor
+			if m.cursor < len(m.choices)-1 {
+
+				m.selected = m.cursor
+			} else if m.cursor == spContinueButtonIndex {
+				return m, tea.Quit
+			}
 		}
 	}
 	// Return the updated model to the Bubble Tea runtime for processing.
@@ -112,7 +127,11 @@ func (m *spmodel) View() string {
 		s += fmt.Sprintf("%s [%s] %s\n", cursor, checked, choice)
 	}
 
-	// The footer
+	if spContinueButtonIndex == m.cursor {
+		s += fmt.Sprintf("%s %s\n", ">", spContinueButtonFocused)
+	} else {
+		s += fmt.Sprintf("%s %s\n", " ", spContinueButtonBlurred)
+	}
 	s += "\nPress q to quit.\n"
 
 	// Send the UI for rendering
