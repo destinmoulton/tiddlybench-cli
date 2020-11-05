@@ -12,6 +12,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	te "github.com/muesli/termenv"
 
+	"tiddlybench-cli/internal/config"
 	"tiddlybench-cli/internal/util"
 )
 
@@ -20,10 +21,11 @@ const focusedTextColor = "205"
 var (
 	color               = te.ColorProfile().Color
 	red                 = color("196")
-	focusedPrompt       = te.String("> ").Foreground(color("205")).String()
-	promptPrefix        = "> "
+	focusedPrompt       = te.String(" > ").Foreground(color("205")).String()
+	promptPrefix        = " > "
 	focusedSubmitButton = "[ " + te.String("Submit").Foreground(color("205")).String() + " ]"
 	blurredSubmitButton = "[ " + te.String("Submit").Foreground(color("240")).String() + " ]"
+	promptPrefixes      = [3]string{"TiddlyWiki URL", "TiddlyWiki Username", "TiddlyWiki Password"}
 )
 
 type connModel struct {
@@ -35,41 +37,52 @@ type connModel struct {
 	submitButton  string
 }
 
-// PromptForConnection presents the user with a config selection
-func (p *Prompt) promptForConnection() string {
+// PromptForConnectionInfo presents the user with a config selection
+func (p *Prompt) promptForConnectionInfo() (string, string, string) {
 
-	model := buildInitialConnModel()
+	model := p.buildInitialConnModel()
 	if err := tea.NewProgram(&model).Start(); err != nil {
 		fmt.Printf("could not start program: %s\n", err)
 		os.Exit(1)
 	}
 
-	return model.usernameInput.Value()
+	return model.urlInput.Value(), model.usernameInput.Value(), model.passwordInput.Value()
 }
 
-func buildInitialConnModel() connModel {
-	name := textinput.NewModel()
-	name.Placeholder = "https://address-to-your-tiddlywiki.com"
-	name.Focus()
-	name.Prompt = "TiddlyWiki Address " + focusedPrompt
-	name.TextColor = focusedTextColor
-	name.CharLimit = 255
+func (p *Prompt) buildInitialConnModel() connModel {
+	url := p.config.Get(config.CKURL)
+	username := p.config.Get(config.CKUsername)
 
-	email := textinput.NewModel()
-	email.Placeholder = "Username"
-	email.Prompt = "TiddlyWiki Username " + promptPrefix
-	email.CharLimit = 128
+	iurl := textinput.NewModel()
+	iurl.Focus()
+	iurl.Prompt = promptPrefixes[0] + focusedPrompt
+	iurl.TextColor = focusedTextColor
+	iurl.CharLimit = 255
+	if url != "" {
+		iurl.SetValue(url)
+	} else {
+		iurl.Placeholder = "https://address-to-your-tiddlywiki.com"
+	}
 
-	password := textinput.NewModel()
-	password.Placeholder = "Password"
-	password.Prompt = promptPrefix
-	password.EchoMode = textinput.EchoPassword
-	password.EchoCharacter = '•'
-	password.CharLimit = 128
+	iusername := textinput.NewModel()
+	iusername.Prompt = promptPrefixes[1] + promptPrefix
+	iusername.CharLimit = 128
+	if username != "" {
+		iusername.SetValue(username)
+	} else {
+		iusername.Placeholder = "Username"
+	}
+
+	ipassword := textinput.NewModel()
+	ipassword.Placeholder = "Password"
+	ipassword.Prompt = promptPrefixes[2] + promptPrefix
+	ipassword.EchoMode = textinput.EchoPassword
+	ipassword.EchoCharacter = '•'
+	ipassword.CharLimit = 128
 
 	error := ""
 
-	return connModel{0, name, email, password, error, blurredSubmitButton}
+	return connModel{0, iurl, iusername, ipassword, error, blurredSubmitButton}
 
 }
 func (m *connModel) Init() tea.Cmd {
@@ -127,13 +140,13 @@ func (m *connModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				if i == m.index {
 					// Set focused state
 					inputs[i].Focus()
-					inputs[i].Prompt = focusedPrompt
+					inputs[i].Prompt = promptPrefixes[i] + focusedPrompt
 					inputs[i].TextColor = focusedTextColor
 					continue
 				}
 				// Remove focused state
 				inputs[i].Blur()
-				inputs[i].Prompt = promptPrefix
+				inputs[i].Prompt = promptPrefixes[i] + promptPrefix
 				inputs[i].TextColor = ""
 			}
 

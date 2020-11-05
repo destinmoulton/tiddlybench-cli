@@ -1,8 +1,6 @@
 package prompt
 
 import (
-	"errors"
-	"fmt"
 	"github.com/manifoldco/promptui"
 	"strings"
 	"tiddlybench-cli/internal/config"
@@ -25,39 +23,34 @@ func New(log logger.Logger, config *config.Config) *Prompt {
 	return p
 }
 
-// PromptForConfig asks the user a series of config questions
+// PromptConfigDispatch asks the user a series of config questions
 func (p *Prompt) PromptConfigDispatch() {
 
 	// User auth prompts
-	connectionDetails := p.promptForConnection()
+	url, username, password := p.promptForConnectionInfo()
 	shouldSavePassword := p.PromptForSavePassword()
-	fmt.Println(connectionDetails)
-	fmt.Println(shouldSavePassword)
-	/*
-		password := ""
-		if savePassword == config.CKYes {
-			password = p.PromptForPassword()
-		}
 
-		// destination prompts
-		inboxTitle, inboxTags := p.promptDestination(config.CKInbox)
-		journalTitle, journalTags := p.promptDestination(config.CKJournal)
-		defaultDestination := p.promptDefaultDestination()
-
-		// Set the c values
-		if url != "" && username != "" {
-			p.config.Set(config.CKURL, url)
-			p.config.Set(config.CKUsername, username)
-			p.config.Set(config.CKShouldSavePassword, savePassword)
-			p.config.Set(config.CKPassword, password)
+	if shouldSavePassword == config.CKNo {
+		// Blank out the password
+		password = ""
+	} else {
+		// Add the code to encrypt the password here
+	}
+	// Set the config values
+	if url != "" && username != "" {
+		p.config.Set(config.CKURL, url)
+		p.config.Set(config.CKUsername, username)
+		p.config.Set(config.CKShouldSavePassword, shouldSavePassword)
+		p.config.Set(config.CKPassword, password)
+		/*
 			p.config.SetNested([]string{config.CKDestinations, config.CKInbox, config.CKTitleTemplate}, inboxTitle)
 			p.config.SetNested([]string{config.CKDestinations, config.CKInbox, config.CKTags}, inboxTags)
 			p.config.SetNested([]string{config.CKDestinations, config.CKJournal, config.CKTitleTemplate}, journalTitle)
 			p.config.SetNested([]string{config.CKDestinations, config.CKJournal, config.CKTags}, journalTags)
 			p.config.Set(config.CKDestinations+"."+config.CKDefaultDestination, defaultDestination)
-			p.config.Save()
-		}
-	*/
+		*/
+		p.config.Save()
+	}
 }
 
 func (p *Prompt) promptDefaultDestination() string {
